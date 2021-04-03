@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/logoScreenFragment">
+
+    <fragment
+        android:id="@+id/logoScreenFragment"
+        android:name="com.example.quicklasdemo.LogoScreenFragment"
+        android:label="fragment_logo_screen"
+        tools:layout="@layout/fragment_logo_screen" >
+        <action
+            android:id="@+id/action_logoScreenFragment_to_trackSetupFragment"
+            app:destination="@id/trackSetupFragment"
+            app:enterAnim="@anim/fragment_close_enter" />
+    </fragment>
+    <fragment
+        android:id="@+id/trackSetupFragment"
+        android:name="com.example.quicklasdemo.TrackSetupFragment"
+        android:label="fragment_track_setup"
+        tools:layout="@layout/fragment_track_setup" />
+</navigation>

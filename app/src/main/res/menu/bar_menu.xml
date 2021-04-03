@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_add_track"
+        android:title="Add Track"
+        android:icon="@drawable/ic_add_track"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/item_go_to_graph"
+        android:title="Create Graph"
+        android:icon="@drawable/ic_go_to_graph"
+        app:showAsAction="always"/>
+</menu>
