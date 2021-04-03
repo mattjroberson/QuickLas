@@ -32,9 +32,4 @@ class TrackSetupFragment : Fragment() {
         rv_track_list.layoutManager = LinearLayoutManager(view.context)
 
     }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        setHasOptionsMenu(true)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
 }
