@@ -7,7 +7,16 @@
 
     <fragment
         android:id="@+id/trackSetupFragment"
-        android:name="com.example.quicklasdemo.TrackSetupFragment"
+        android:name="com.example.quicklasdemo.TrackListFragment"
         android:label="fragment_track_setup"
-        tools:layout="@layout/fragment_track_setup" />
+        tools:layout="@layout/fragment_track_list" >
+        <action
+            android:id="@+id/action_trackSetupFragment_to_trackSettingsFragment"
+            app:destination="@id/trackSettingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/trackSettingsFragment"
+        android:name="com.example.quicklasdemo.TrackSettingsFragment"
+        android:label="fragment_track_settings"
+        tools:layout="@layout/fragment_track_settings" />
 </navigation>
