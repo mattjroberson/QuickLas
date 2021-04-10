@@ -21,7 +21,7 @@ class RvAdapter(var rvItems: List<RvItem>, private var view: View) : RecyclerVie
     }
 
     override fun onBindViewHolder(holder: RvViewHolder, position: Int) {
-        RvItemFactory.bindViewHolder(view, holder.itemView, rvItems[position])
+        RvItemFactory.bindViewHolder(holder.itemView, rvItems[position])
     }
 
     override fun getItemCount(): Int {

@@ -5,13 +5,15 @@
     android:layout_height="50dp"
     android:background="@drawable/bg_item">
 
-    <TextView
-        android:id="@+id/label_title"
+    <EditText
+        android:id="@+id/editable_text"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
 
-        android:text="place_holder"
-        android:textSize="26sp"
+        android:text="setting"
+        android:textSize="20sp"
+        android:maxLines="1"
+        android:inputType="text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

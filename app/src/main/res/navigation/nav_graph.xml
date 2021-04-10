@@ -13,14 +13,20 @@
         <action
             android:id="@+id/action_trackSetupFragment_to_trackSettingsFragment"
             app:destination="@id/trackSettingsFragment" />
+        <argument
+            android:name="ModifiedTrack"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/trackSettingsFragment"
         android:name="com.example.quicklasdemo.fragments.TrackSettingsFragment"
         android:label="fragment_track_settings"
-        tools:layout="@layout/fragment_track_settings" />
-    <fragment
-        android:id="@+id/testTrackSettingsFragment"
-        android:name="com.example.quicklasdemo.fragments.TrackListFragment"
-        android:label="TestTrackSettingsFragment" />
+        tools:layout="@layout/fragment_track_settings" >
+        <argument
+            android:name="TrackData"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_trackSettingsFragment_to_trackSetupFragment"
+            app:destination="@id/trackSetupFragment" />
+    </fragment>
 </navigation>

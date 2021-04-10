@@ -7,13 +7,14 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import com.example.quicklasdemo.R
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
-
-private const val FILE_PICKER_REQUEST_CODE = 2
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,16 +28,15 @@ class MainActivity : AppCompatActivity() {
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.also { uri ->
+                //TODO: Pass raw las on to app somehow
                 val lasFileData = readTextFromUri(uri)
-                launchTrackSettingsActivity(lasFileData)
+                launchTrackSettingsActivity()
             }
         }
     }
 
-    private fun launchTrackSettingsActivity(lasFileData: ArrayList<String>){
+    private fun launchTrackSettingsActivity(){
         val intent = Intent(this, TrackConfigActivity::class.java)
-        //TODO: Pass lasData to the TrackConfigActivitySomehow
-        //intent.putExtra("lasFileData", lasFileData)
         startActivity(intent)
     }
 
@@ -47,17 +47,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         startForResult.launch(intent)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-        super.onActivityResult(requestCode, resultCode, resultData)
-
-        if (requestCode == 2 && resultCode == Activity.RESULT_OK) {
-            resultData?.data?.also { uri ->
-                //val lasFileData = readTextFromUri(uri)
-                //launchTrackSettingsActivity(lasFileData)
-            }
-        }
     }
 
     @Throws(IOException::class)

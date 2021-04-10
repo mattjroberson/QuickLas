@@ -1,23 +1,33 @@
 package com.example.quicklasdemo.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.quicklasdemo.R
 import com.example.quicklasdemo.RvAdapter
 import com.example.quicklasdemo.Toolbar
-import com.example.quicklasdemo.rv_items.RvTrackItem
+import com.example.quicklasdemo.data.Track
+import com.example.quicklasdemo.rv_items.RvTrackEntryItem
 import kotlinx.android.synthetic.main.fragment_track_list.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class TrackListFragment : Fragment() {
-    private lateinit var trackList: MutableList<RvTrackItem>
+    private var trackItems = mutableListOf<RvTrackEntryItem>()
+    private lateinit var tracksData: MutableList<Track>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        //Dummy object representing current tracks
+        //Theoretically will be replaced by saved data call
+        tracksData = mutableListOf(Track("Primary Track"))
         return inflater.inflate(R.layout.fragment_track_list, container, false)
     }
 
@@ -27,48 +37,69 @@ class TrackListFragment : Fragment() {
         Toolbar(view, "Well Name", "Pick Tracks",
             R.id.toolbar_track_list, R.menu.menu_track_list, ::menuItemHandler)
 
-        trackList = mutableListOf(
-            RvTrackItem("Track 1", ::actionHandler),
-            RvTrackItem("Track 2", ::actionHandler),
-            RvTrackItem("Track 3", ::actionHandler),
-            RvTrackItem("Track 4", ::actionHandler)
-        )
+        getDataFromSettingsFragment()
 
-        val trackListAdapter = RvAdapter(trackList, view)
+        tracksData.forEach{
+            trackItems.add(RvTrackEntryItem(it, ::actionHandler))
+        }
+
+        connectRecyclerViewAdapter(view)
+    }
+
+    private fun getDataFromSettingsFragment(){
+        val trackDataString = arguments?.getString("trackData")
+
+        trackDataString?.let {
+            val track = Json.decodeFromString<Track>(it)
+            Log.i("TEST", track.trackName)
+
+            tracksData.remove(tracksData.find{it.trackName == track.trackName})
+            tracksData.add(track)
+
+            track
+        }
+    }
+
+    private fun connectRecyclerViewAdapter(view : View){
+        val trackListAdapter = RvAdapter(trackItems, view)
 
         rv_track_list.apply{
             adapter = trackListAdapter
             layoutManager = LinearLayoutManager(view.context)
         }
-
     }
 
     private fun menuItemHandler(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.item_add_track -> addTrack()
-
             R.id.item_go_to_graph -> gotoGraph()
         }
         return true
     }
 
-    private fun actionHandler(item : RvTrackItem, type : RvTrackItem.Companion.ActionType){
+    private fun actionHandler(item : RvTrackEntryItem, type : RvTrackEntryItem.Companion.ActionType){
         when(type){
-            RvTrackItem.Companion.ActionType.EDIT -> editTrack(item)
-            RvTrackItem.Companion.ActionType.DELETE -> deleteTrack(item)
+            RvTrackEntryItem.Companion.ActionType.EDIT -> editTrack(item)
+            RvTrackEntryItem.Companion.ActionType.DELETE -> deleteTrack(item)
         }
     }
 
-    private fun editTrack(item : RvTrackItem) {
-        view?.findNavController()?.navigate(R.id.action_trackSetupFragment_to_trackSettingsFragment);
+    private fun editTrack(item : RvTrackEntryItem) {
+        val trackDataString = Json.encodeToString(item.trackData)
+        val bundle = bundleOf("modifiedTrackData" to trackDataString)
+
+        view?.findNavController()?.navigate(R.id.action_trackSetupFragment_to_trackSettingsFragment, bundle)
     }
 
     private fun addTrack(){
+        val trackDataString = Json.encodeToString(Track("New Track"))
+        val bundle = bundleOf("modifiedTrackData" to trackDataString)
 
+        view?.findNavController()?.navigate(R.id.action_trackSetupFragment_to_trackSettingsFragment, bundle)
     }
 
-    private fun deleteTrack(item : RvTrackItem) {
-        trackList.apply {
+    private fun deleteTrack(item : RvTrackEntryItem) {
+        trackItems.apply {
             val position = indexOf(item)
             removeAt(position)
 
