@@ -22,12 +22,12 @@ import kotlinx.serialization.json.Json
 
 class TrackListFragment : Fragment() {
     private var trackItems = mutableListOf<RvTrackEntryItem>()
-    private lateinit var tracksData: MutableList<Track>
+    private var tracksData = mutableListOf(Track("Primary Track"))
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         //Dummy object representing current tracks
         //Theoretically will be replaced by saved data call
-        tracksData = mutableListOf(Track("Primary Track"))
+
         return inflater.inflate(R.layout.fragment_track_list, container, false)
     }
 
@@ -48,15 +48,24 @@ class TrackListFragment : Fragment() {
 
     private fun getDataFromSettingsFragment(){
         val trackDataString = arguments?.getString("trackData")
+        val tracksDataListString = arguments?.getString("tracksDataList")
+        val trackIndex = arguments?.getInt("trackIndex")
+
+        tracksDataListString?.let {
+            tracksData = Json.decodeFromString(it)
+        }
 
         trackDataString?.let {
             val track = Json.decodeFromString<Track>(it)
-            Log.i("TEST", track.trackName)
 
-            tracksData.remove(tracksData.find{it.trackName == track.trackName})
-            tracksData.add(track)
-
-            track
+            //If index is not -1 (new track) replace old reference
+            if(trackIndex != -1) {
+                tracksData[trackIndex!!] = track
+            }
+            //Otherwise append new track
+            else{
+                tracksData.add(track)
+            }
         }
     }
 
@@ -86,14 +95,24 @@ class TrackListFragment : Fragment() {
 
     private fun editTrack(item : RvTrackEntryItem) {
         val trackDataString = Json.encodeToString(item.trackData)
-        val bundle = bundleOf("modifiedTrackData" to trackDataString)
+        val tracksDataListString = Json.encodeToString(tracksData)
+
+        val bundle = bundleOf("modifiedTrackData" to trackDataString,
+                                "tracksDataList" to tracksDataListString,
+                                "trackIndex" to trackItems.indexOf(item))
 
         view?.findNavController()?.navigate(R.id.action_trackSetupFragment_to_trackSettingsFragment, bundle)
     }
 
     private fun addTrack(){
         val trackDataString = Json.encodeToString(Track("New Track"))
-        val bundle = bundleOf("modifiedTrackData" to trackDataString)
+        val tracksDataListString = Json.encodeToString(tracksData)
+
+        Log.i("TEST", tracksData.size.toString())
+
+        val bundle = bundleOf("modifiedTrackData" to trackDataString,
+                                    "tracksDataList" to tracksDataListString,
+                                    "trackIndex" to -1)
 
         view?.findNavController()?.navigate(R.id.action_trackSetupFragment_to_trackSettingsFragment, bundle)
     }
@@ -101,6 +120,8 @@ class TrackListFragment : Fragment() {
     private fun deleteTrack(item : RvTrackEntryItem) {
         trackItems.apply {
             val position = indexOf(item)
+
+            Log.i("TEST", tracksData.removeAt(position).toString())
             removeAt(position)
 
             rv_track_list.adapter?.apply {

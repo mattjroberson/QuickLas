@@ -24,6 +24,7 @@ import kotlinx.serialization.json.Json
 
 class TrackSettingsFragment : Fragment() {
     private lateinit var trackData : Track
+    private lateinit var oldTrackData : Track
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_track_settings, container, false)
@@ -37,7 +38,9 @@ class TrackSettingsFragment : Fragment() {
 
         //TODO: I am not totally comfortable with this forced unwrapping, maybe add exception case later
         val trackDataString = arguments?.getString("modifiedTrackData")
+
         trackData = Json.decodeFromString(trackDataString!!)
+        oldTrackData = trackData.copy()
 
         val trackList = mutableListOf(
             RvTextFieldItem(trackData.trackName) {trackData.trackName = it},
@@ -68,12 +71,19 @@ class TrackSettingsFragment : Fragment() {
 
     private fun saveAndReturn(){
         val trackDataString = Json.encodeToString(trackData)
-        val bundle = bundleOf("trackData" to trackDataString)
+        val bundle = bundleOf("trackData" to trackDataString,
+                                "tracksDataList" to arguments?.getString("tracksDataList"),
+                                "trackIndex" to arguments?.getInt("trackIndex"))
 
         view?.findNavController()?.navigate(R.id.action_trackSettingsFragment_to_trackSetupFragment, bundle)
     }
 
     private fun discardAndReturn(){
+        val trackDataString = Json.encodeToString(oldTrackData)
+        val bundle = bundleOf("trackData" to trackDataString,
+                "tracksDataList" to arguments?.getString("tracksDataList"),
+                "trackIndex" to arguments?.getInt("trackIndex"))
+
         view?.findNavController()?.navigate(R.id.action_trackSettingsFragment_to_trackSetupFragment)
     }
 }
