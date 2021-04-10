@@ -8,7 +8,6 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.quicklasdemo.R
-import com.example.quicklasdemo.TrackConfigActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.BufferedReader
 import java.io.IOException
