@@ -14,9 +14,7 @@ import com.example.quicklasdemo.R
 import com.example.quicklasdemo.RvAdapter
 import com.example.quicklasdemo.Toolbar
 import com.example.quicklasdemo.data.Track
-import com.example.quicklasdemo.rv_items.RvBooleanItem
-import com.example.quicklasdemo.rv_items.RvItem
-import com.example.quicklasdemo.rv_items.RvTextFieldItem
+import com.example.quicklasdemo.rv_items.*
 import kotlinx.android.synthetic.main.fragment_track_settings.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -36,20 +34,24 @@ class TrackSettingsFragment : Fragment() {
         Toolbar(view, "Well Name", "Track Settings",
             R.id.toolbar_track_settings, R.menu.menu_track_settings, ::menuItemHandler)
 
-        //TODO: I am not totally comfortable with this forced unwrapping, maybe add exception case later
         val trackDataString = arguments?.getString("modifiedTrackData")
 
+        //TODO: I am not totally comfortable with this forced unwrapping, maybe add exception case later
         trackData = Json.decodeFromString(trackDataString!!)
         oldTrackData = trackData.copy()
 
         val trackList = mutableListOf(
             RvTextFieldItem(trackData.trackName) {trackData.trackName = it},
-            RvItem("Curves"),
-            RvBooleanItem("Display Linear Graph", trackData.isLinear) {trackData.isLinear = it},
-            RvBooleanItem("Show Grid", trackData.showGrid) {trackData.showGrid = it},
-//            TrackSettingDigitItem("Min Depth"),
-//            TrackSettingDigitItem("Max Depth"),
-
+            RvClickableItem("Curves") {onCurveLabelClicked()},
+            RvBooleanItem("Display Linear Graph",
+                    trackData.isLinear) {trackData.isLinear = it},
+            RvBooleanItem("Show Grid",
+                    trackData.showGrid) {trackData.showGrid = it},
+            RvNumberFieldItem("Vertical Divider Count",
+                    trackData.verticalDivCount) {trackData.verticalDivCount = it},
+            RvNumberFieldItem("Horizontal Divider Height (ft)",
+                    trackData.horizontalDivHeight) {trackData.horizontalDivHeight = it},
+            RvDropdownItem("TEST") {Log.i("TEST", it)}
         )
 
         val trackSettingsAdapter = RvAdapter(trackList, view)
@@ -62,28 +64,23 @@ class TrackSettingsFragment : Fragment() {
 
     private fun menuItemHandler(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.item_save_changes -> saveAndReturn()
-
-            R.id.item_dont_save_changes -> discardAndReturn()
+            R.id.item_save_changes -> navigateBackToTrackConfig(trackData, true)
+            R.id.item_dont_save_changes -> navigateBackToTrackConfig(oldTrackData, false)
         }
         return true
     }
 
-    private fun saveAndReturn(){
-        val trackDataString = Json.encodeToString(trackData)
-        val bundle = bundleOf("trackData" to trackDataString,
-                                "tracksDataList" to arguments?.getString("tracksDataList"),
-                                "trackIndex" to arguments?.getInt("trackIndex"))
-
-        view?.findNavController()?.navigate(R.id.action_trackSettingsFragment_to_trackSetupFragment, bundle)
+    private fun onCurveLabelClicked(){
+        //navigate to curve list
     }
 
-    private fun discardAndReturn(){
-        val trackDataString = Json.encodeToString(oldTrackData)
+    private fun navigateBackToTrackConfig(track: Track, save: Boolean) {
+        val trackDataString = Json.encodeToString(track)
         val bundle = bundleOf("trackData" to trackDataString,
-                "tracksDataList" to arguments?.getString("tracksDataList"),
+                "lasName" to arguments?.getString("lasName"),
+                "save" to save,
                 "trackIndex" to arguments?.getInt("trackIndex"))
 
-        view?.findNavController()?.navigate(R.id.action_trackSettingsFragment_to_trackSetupFragment)
+        view?.findNavController()?.navigate(R.id.action_trackSettingsFragment_to_trackSetupFragment, bundle)
     }
 }

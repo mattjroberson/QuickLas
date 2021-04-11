@@ -4,10 +4,12 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.navigation.findNavController
 import com.example.quicklasdemo.R
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.serialization.encodeToString
@@ -30,13 +32,16 @@ class MainActivity : AppCompatActivity() {
             result.data?.data?.also { uri ->
                 //TODO: Pass raw las on to app somehow
                 val lasFileData = readTextFromUri(uri)
-                launchTrackSettingsActivity()
+                launchTrackSettingsActivity(uri.lastPathSegment!!)
             }
         }
     }
 
-    private fun launchTrackSettingsActivity(){
+    private fun launchTrackSettingsActivity(fileName: String){
+        Log.i("TEST", fileName)
+
         val intent = Intent(this, TrackConfigActivity::class.java)
+        intent.putExtra("lasName", fileName)
         startActivity(intent)
     }
 

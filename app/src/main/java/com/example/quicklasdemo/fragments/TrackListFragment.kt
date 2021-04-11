@@ -1,15 +1,13 @@
 package com.example.quicklasdemo.fragments
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.quicklasdemo.DatabaseHelper
 import com.example.quicklasdemo.R
 import com.example.quicklasdemo.RvAdapter
 import com.example.quicklasdemo.Toolbar
@@ -20,23 +18,20 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class TrackListFragment : Fragment() {
+class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     private var trackItems = mutableListOf<RvTrackEntryItem>()
-    private var tracksData = mutableListOf(Track("Primary Track"))
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        //Dummy object representing current tracks
-        //Theoretically will be replaced by saved data call
-
-        return inflater.inflate(R.layout.fragment_track_list, container, false)
-    }
+    private lateinit var tracksData: MutableList<Track>
+    private lateinit var database: DatabaseHelper
+    private lateinit var currLasName: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        database = DatabaseHelper(view.context, null)
 
         Toolbar(view, "Well Name", "Pick Tracks",
             R.id.toolbar_track_list, R.menu.menu_track_list, ::menuItemHandler)
 
+        loadTracksDataFromDB()
         getDataFromSettingsFragment()
 
         tracksData.forEach{
@@ -46,27 +41,34 @@ class TrackListFragment : Fragment() {
         connectRecyclerViewAdapter(view)
     }
 
+    private fun loadTracksDataFromDB(){
+        currLasName = arguments?.getString("lasName")!!;
+        tracksData = database.getTracksList(currLasName) ?: mutableListOf()
+    }
+
+    private fun storeTracksDataInDB(){
+        database.addTracksList(currLasName, tracksData)
+    }
+
     private fun getDataFromSettingsFragment(){
+        val save = arguments?.getBoolean("save")
+        if(save == false) return
+
         val trackDataString = arguments?.getString("trackData")
-        val tracksDataListString = arguments?.getString("tracksDataList")
         val trackIndex = arguments?.getInt("trackIndex")
 
-        tracksDataListString?.let {
-            tracksData = Json.decodeFromString(it)
-        }
 
         trackDataString?.let {
             val track = Json.decodeFromString<Track>(it)
-
             //If index is not -1 (new track) replace old reference
-            if(trackIndex != -1) {
+            if (trackIndex != -1) {
                 tracksData[trackIndex!!] = track
-            }
-            //Otherwise append new track
-            else{
+            } else { //Otherwise append new track
                 tracksData.add(track)
             }
         }
+
+        database.addTracksList(currLasName, tracksData)
     }
 
     private fun connectRecyclerViewAdapter(view : View){
@@ -94,34 +96,20 @@ class TrackListFragment : Fragment() {
     }
 
     private fun editTrack(item : RvTrackEntryItem) {
-        val trackDataString = Json.encodeToString(item.trackData)
-        val tracksDataListString = Json.encodeToString(tracksData)
-
-        val bundle = bundleOf("modifiedTrackData" to trackDataString,
-                                "tracksDataList" to tracksDataListString,
-                                "trackIndex" to trackItems.indexOf(item))
-
-        view?.findNavController()?.navigate(R.id.action_trackSetupFragment_to_trackSettingsFragment, bundle)
+        storeTracksDataInDB()
+        navigateIntoTrackSettings(item.trackData, trackItems.indexOf(item))
     }
 
     private fun addTrack(){
-        val trackDataString = Json.encodeToString(Track("New Track"))
-        val tracksDataListString = Json.encodeToString(tracksData)
-
-        Log.i("TEST", tracksData.size.toString())
-
-        val bundle = bundleOf("modifiedTrackData" to trackDataString,
-                                    "tracksDataList" to tracksDataListString,
-                                    "trackIndex" to -1)
-
-        view?.findNavController()?.navigate(R.id.action_trackSetupFragment_to_trackSettingsFragment, bundle)
+        storeTracksDataInDB()
+        navigateIntoTrackSettings(Track("New Track"), -1)
     }
 
     private fun deleteTrack(item : RvTrackEntryItem) {
         trackItems.apply {
             val position = indexOf(item)
 
-            Log.i("TEST", tracksData.removeAt(position).toString())
+            tracksData.removeAt(position)
             removeAt(position)
 
             rv_track_list.adapter?.apply {
@@ -129,9 +117,18 @@ class TrackListFragment : Fragment() {
                 notifyItemRangeChanged(position, size);
             }
         }
+        storeTracksDataInDB()
     }
 
-    private fun gotoGraph(){
+    private fun gotoGraph(){}
 
+    private fun navigateIntoTrackSettings(track: Track, index: Int) {
+        val trackDataString = Json.encodeToString(track)
+
+        val bundle = bundleOf("modifiedTrackData" to trackDataString,
+                "lasName" to currLasName,
+                "trackIndex" to index)
+
+        view?.findNavController()?.navigate(R.id.action_trackSetupFragment_to_trackSettingsFragment, bundle)
     }
 }

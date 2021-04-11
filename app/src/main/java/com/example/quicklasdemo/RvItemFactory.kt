@@ -1,19 +1,18 @@
 package com.example.quicklasdemo
 
 import android.view.View
-import com.example.quicklasdemo.rv_items.RvBooleanItem
-import com.example.quicklasdemo.rv_items.RvItem
-import com.example.quicklasdemo.rv_items.RvTrackEntryItem
-import com.example.quicklasdemo.rv_items.RvTextFieldItem
+import com.example.quicklasdemo.rv_items.*
 
 class RvItemFactory {
     companion object {
         fun getItemViewType(item : RvItem): Int {
             when(item) {
+                is RvClickableItem -> return 0;
                 is RvTrackEntryItem -> return 1;
                 is RvTextFieldItem -> return 2;
                 is RvBooleanItem -> return 3;
-                is RvItem -> return 0;
+                is RvNumberFieldItem -> return 4;
+                is RvDropdownItem -> return 5;
             }
 
             return -1;
@@ -21,10 +20,12 @@ class RvItemFactory {
 
         fun getItemLayout(viewType : Int): Int {
             when(viewType){
-                0 -> return R.layout.item_label
+                0 -> return R.layout.item_clickable
                 1 -> return R.layout.item_track_entry
                 2 -> return R.layout.item_text_field
                 3 -> return R.layout.item_boolean
+                4 -> return R.layout.item_number_field
+                5 -> return R.layout.item_dropdown
             }
 
             return -1;
