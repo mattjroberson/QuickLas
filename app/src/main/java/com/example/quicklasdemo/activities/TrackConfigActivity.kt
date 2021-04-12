@@ -5,6 +5,7 @@ import android.os.PersistableBundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.quicklasdemo.R
@@ -18,8 +19,12 @@ class TrackConfigActivity : AppCompatActivity(R.layout.activity_track_config){
         super.onCreate(savedInstanceState)
 
         val lasName = intent.getStringExtra("lasName")
-        Log.i("TEST", lasName)
-        val bundle = bundleOf("lasName" to lasName)
+
+        val bundle = bundleOf("lasName" to lasName,
+            "saveSettings" to false,
+            "trackData" to null,
+            "trackIndex" to -1)
+
         findNavController(R.id.nav_host_fragment_container)
                 .setGraph(R.navigation.nav_graph, bundle)
 

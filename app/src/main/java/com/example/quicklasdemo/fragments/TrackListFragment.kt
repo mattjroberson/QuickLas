@@ -3,7 +3,6 @@ package com.example.quicklasdemo.fragments
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,12 +22,17 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     private lateinit var tracksData: MutableList<Track>
     private lateinit var database: DatabaseHelper
     private lateinit var currLasName: String
+    private lateinit var args: TrackListFragmentArgs
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        args = TrackListFragmentArgs.fromBundle(requireArguments())
+
+        currLasName = args.lasName
+
         database = DatabaseHelper(view.context, null)
 
-        Toolbar(view, "Well Name", "Pick Tracks",
+        Toolbar(view, currLasName, "Pick Tracks",
             R.id.toolbar_track_list, R.menu.menu_track_list, ::menuItemHandler)
 
         loadTracksDataFromDB()
@@ -42,33 +46,30 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     }
 
     private fun loadTracksDataFromDB(){
-        currLasName = arguments?.getString("lasName")!!;
-        tracksData = database.getTracksList(currLasName) ?: mutableListOf()
+        tracksData = database.getTrackList(currLasName, DatabaseHelper.TABLE_TRACK_LISTS) ?: mutableListOf()
     }
 
     private fun storeTracksDataInDB(){
-        database.addTracksList(currLasName, tracksData)
+        database.addTrackList(currLasName, DatabaseHelper.TABLE_TRACK_LISTS, tracksData)
     }
 
     private fun getDataFromSettingsFragment(){
-        val save = arguments?.getBoolean("save")
-        if(save == false) return
+        if(!args.saveSettings) return
 
-        val trackDataString = arguments?.getString("trackData")
-        val trackIndex = arguments?.getInt("trackIndex")
-
+        val trackDataString = args.trackData
+        val trackIndex = args.trackIndex
 
         trackDataString?.let {
             val track = Json.decodeFromString<Track>(it)
             //If index is not -1 (new track) replace old reference
             if (trackIndex != -1) {
-                tracksData[trackIndex!!] = track
+                tracksData[trackIndex] = track
             } else { //Otherwise append new track
                 tracksData.add(track)
             }
         }
 
-        database.addTracksList(currLasName, tracksData)
+        database.addTrackList(currLasName, DatabaseHelper.TABLE_TRACK_LISTS, tracksData)
     }
 
     private fun connectRecyclerViewAdapter(view : View){
@@ -114,7 +115,7 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
 
             rv_track_list.adapter?.apply {
                 notifyItemRemoved(position)
-                notifyItemRangeChanged(position, size);
+                notifyItemRangeChanged(position, size)
             }
         }
         storeTracksDataInDB()
@@ -125,10 +126,8 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     private fun navigateIntoTrackSettings(track: Track, index: Int) {
         val trackDataString = Json.encodeToString(track)
 
-        val bundle = bundleOf("modifiedTrackData" to trackDataString,
-                "lasName" to currLasName,
-                "trackIndex" to index)
-
-        view?.findNavController()?.navigate(R.id.action_trackSetupFragment_to_trackSettingsFragment, bundle)
+        val directions = TrackListFragmentDirections.actionTrackSetupFragmentToTrackSettingsFragment(
+            trackDataString, null, currLasName, index, track.trackName)
+        view?.findNavController()?.navigate(directions)
     }
 }

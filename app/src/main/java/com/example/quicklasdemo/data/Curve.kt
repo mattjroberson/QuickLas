@@ -8,4 +8,5 @@ data class Curve(val curveName: String = "Default Name",
                  val curveColor: String = "#000000",
                  val scaleMin: Float = .1f,
                  val scaleMax: Float = 1.0f,
-                 val cutoffHighlighting: String = "Default?")
+                 val cutoffHighlighting: String = "Default?",
+                 val isSelected: Boolean = false) //IsSelected is for internal UI Logic

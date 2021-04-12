@@ -14,19 +14,63 @@
             android:id="@+id/action_trackSetupFragment_to_trackSettingsFragment"
             app:destination="@id/trackSettingsFragment" />
         <argument
-            android:name="ModifiedTrack"
+            android:name="lasName"
             app:argType="string" />
+        <argument
+            android:name="saveSettings"
+            app:argType="boolean" />
+        <argument
+            android:name="trackData"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="trackIndex"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/trackSettingsFragment"
         android:name="com.example.quicklasdemo.fragments.TrackSettingsFragment"
         android:label="fragment_track_settings"
         tools:layout="@layout/fragment_track_settings" >
-        <argument
-            android:name="TrackData"
-            app:argType="string" />
         <action
             android:id="@+id/action_trackSettingsFragment_to_trackSetupFragment"
             app:destination="@id/trackSetupFragment" />
+        <action
+            android:id="@+id/action_trackSettingsFragment_to_curveListFragment"
+            app:destination="@id/curveListFragment" />
+        <argument
+            android:name="trackData"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="selectedCurves"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="lasName"
+            app:argType="string" />
+        <argument
+            android:name="trackIndex"
+            app:argType="integer" />
+        <argument
+            android:name="trackName"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/curveListFragment"
+        android:name="com.example.quicklasdemo.fragments.CurveListFragment"
+        android:label="fragment_curve_list"
+        tools:layout="@layout/fragment_curve_list" >
+        <action
+            android:id="@+id/action_curveListFragment_to_trackSettingsFragment"
+            app:destination="@id/trackSettingsFragment" />
+        <argument
+            android:name="trackName"
+            app:argType="string" />
+        <argument android:name="lasName"
+            app:argType="string" />
+        <argument
+            android:name="trackIndex"
+            app:argType="integer" />
     </fragment>
 </navigation>

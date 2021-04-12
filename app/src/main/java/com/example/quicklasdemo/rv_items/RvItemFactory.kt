@@ -1,7 +1,7 @@
-package com.example.quicklasdemo
+package com.example.quicklasdemo.rv_items
 
 import android.view.View
-import com.example.quicklasdemo.rv_items.*
+import com.example.quicklasdemo.R
 
 class RvItemFactory {
     companion object {
@@ -13,6 +13,7 @@ class RvItemFactory {
                 is RvBooleanItem -> return 3;
                 is RvNumberFieldItem -> return 4;
                 is RvDropdownItem -> return 5;
+                is RvCurveEntryItem -> return 6;
             }
 
             return -1;
@@ -26,6 +27,7 @@ class RvItemFactory {
                 3 -> return R.layout.item_boolean
                 4 -> return R.layout.item_number_field
                 5 -> return R.layout.item_dropdown
+                6 -> return R.layout.item_curve_entry
             }
 
             return -1;

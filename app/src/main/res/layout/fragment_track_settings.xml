@@ -9,7 +9,7 @@
 
     <include
         android:id="@+id/toolbar_track_settings"
-        layout="@layout/toolbar_track_config"
+        layout="@layout/toolbar_config"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

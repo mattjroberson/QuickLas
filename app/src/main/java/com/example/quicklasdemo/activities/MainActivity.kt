@@ -32,14 +32,14 @@ class MainActivity : AppCompatActivity() {
             result.data?.data?.also { uri ->
                 //TODO: Pass raw las on to app somehow
                 val lasFileData = readTextFromUri(uri)
-                launchTrackSettingsActivity(uri.lastPathSegment!!)
+
+                val lasName = uri.lastPathSegment!!.split("/")[1].split(".")[0]
+                launchTrackSettingsActivity(lasName)
             }
         }
     }
 
     private fun launchTrackSettingsActivity(fileName: String){
-        Log.i("TEST", fileName)
-
         val intent = Intent(this, TrackConfigActivity::class.java)
         intent.putExtra("lasName", fileName)
         startActivity(intent)

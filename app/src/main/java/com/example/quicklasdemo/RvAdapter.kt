@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.quicklasdemo.rv_items.RvItem
+import com.example.quicklasdemo.rv_items.RvItemFactory
 
 class RvAdapter(var rvItems: List<RvItem>, private var view: View) : RecyclerView.Adapter<RvAdapter.RvViewHolder>(){
     inner class RvViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
