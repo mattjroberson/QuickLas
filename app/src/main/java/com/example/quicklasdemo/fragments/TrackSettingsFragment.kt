@@ -27,7 +27,7 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        db = DatabaseHelper(view.context, null)
+        db = DatabaseHelper(view.context)
 
         args = TrackSettingsFragmentArgs.fromBundle(requireArguments())
 

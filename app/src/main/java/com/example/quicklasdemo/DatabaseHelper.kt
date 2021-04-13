@@ -12,9 +12,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class DatabaseHelper(context: Context,
-                     factory: SQLiteDatabase.CursorFactory?) :
-                     SQLiteOpenHelper(context, DB_NAME, factory, VERSION) {
+class DatabaseHelper(context: Context):
+                     SQLiteOpenHelper(context, DB_NAME, null, VERSION) {
 
     override fun onCreate(db: SQLiteDatabase?) {
         createTable(db, TABLE_SETTINGS)
@@ -67,7 +66,7 @@ class DatabaseHelper(context: Context,
     //region Get Data
 
     fun getTrackList(name: String): MutableList<Track>? {
-        val serializedList = getSerializedStringFromList(name, TABLE_SETTINGS)
+        val serializedList = getSerializedStringFromList("$name.trackList", TABLE_SETTINGS)
 
         serializedList?.let {
             return Json.decodeFromString(it)
@@ -82,10 +81,10 @@ class DatabaseHelper(context: Context,
         }; return null
     }
 
-    fun getLasData(tableName: String): MutableMap<String, MutableList<Float>>? {
-        ensureTableCreated(tableName)
+    fun getLasData(lasName: String): MutableMap<String, MutableList<Float>>? {
+        ensureTableCreated(lasName)
 
-        val query = "SELECT * FROM $tableName"
+        val query = "SELECT * FROM $lasName"
 
         val db = this.writableDatabase
         val cursor = db.rawQuery(query, null)

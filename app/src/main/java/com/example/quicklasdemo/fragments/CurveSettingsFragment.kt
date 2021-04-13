@@ -6,12 +6,10 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.quicklasdemo.DatabaseHelper
 import com.example.quicklasdemo.R
 import com.example.quicklasdemo.RvAdapter
 import com.example.quicklasdemo.Toolbar
 import com.example.quicklasdemo.data.Curve
-import com.example.quicklasdemo.data.Track
 import com.example.quicklasdemo.rv_items.*
 import kotlinx.android.synthetic.main.fragment_curve_settings.*
 import kotlinx.serialization.decodeFromString
@@ -28,7 +26,7 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
 
         args = CurveSettingsFragmentArgs.fromBundle(requireArguments())
 
-        curveData = Json.decodeFromString(args.curveData!!)
+        curveData = Json.decodeFromString(args.curveData)
         oldCurveData = curveData.copy()
 
         Toolbar(view, curveData.curveName, "Curve Settings",

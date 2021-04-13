@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        db = DatabaseHelper(this.applicationContext, null)
+        db = DatabaseHelper(this.applicationContext)
 
         iv_file_selector.setOnClickListener() { _ -> openFile() }
     }

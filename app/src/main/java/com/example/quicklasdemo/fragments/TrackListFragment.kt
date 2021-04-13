@@ -1,5 +1,6 @@
 package com.example.quicklasdemo.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -24,19 +25,16 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     private lateinit var currLasName: String
     private lateinit var args: TrackListFragmentArgs
 
-    private val trackListID
-        get() = "$currLasName.trackList"
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         args = TrackListFragmentArgs.fromBundle(requireArguments())
 
         currLasName = args.lasName
 
-        database = DatabaseHelper(view.context, null)
+        database = DatabaseHelper(view.context)
 
         Toolbar(view, currLasName, "Pick Tracks",
-            R.id.toolbar_track_list, R.menu.menu_track_list, ::menuItemHandler)
+                R.id.toolbar_track_list, R.menu.menu_track_list, ::menuItemHandler)
 
         loadTracksDataFromDB()
         getDataFromSettingsFragment()
@@ -49,11 +47,11 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     }
 
     private fun loadTracksDataFromDB(){
-        tracksData = database.getTrackList(trackListID) ?: mutableListOf()
+        tracksData = database.getTrackList(currLasName) ?: mutableListOf()
     }
 
     private fun storeTracksDataInDB(){
-        database.addTrackList(trackListID, tracksData)
+        database.addTrackList(currLasName, tracksData)
     }
 
     private fun getDataFromSettingsFragment(){
@@ -75,7 +73,7 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
         storeTracksDataInDB()
     }
 
-    private fun connectRecyclerViewAdapter(view : View){
+    private fun connectRecyclerViewAdapter(view: View){
         val trackListAdapter = RvAdapter(trackItems, view)
 
         rv_track_list.apply{
@@ -92,14 +90,14 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
         return true
     }
 
-    private fun actionHandler(item : RvTrackEntryItem, type : RvTrackEntryItem.Companion.ActionType){
+    private fun actionHandler(item: RvTrackEntryItem, type: RvTrackEntryItem.Companion.ActionType){
         when(type){
             RvTrackEntryItem.Companion.ActionType.EDIT -> editTrack(item)
             RvTrackEntryItem.Companion.ActionType.DELETE -> deleteTrack(item)
         }
     }
 
-    private fun editTrack(item : RvTrackEntryItem) {
+    private fun editTrack(item: RvTrackEntryItem) {
         storeTracksDataInDB()
         navigateIntoTrackSettings(item.trackData, trackItems.indexOf(item))
     }
@@ -109,7 +107,7 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
         navigateIntoTrackSettings(Track("New Track"), -1)
     }
 
-    private fun deleteTrack(item : RvTrackEntryItem) {
+    private fun deleteTrack(item: RvTrackEntryItem) {
         trackItems.apply {
             val position = indexOf(item)
 
@@ -124,13 +122,17 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
         storeTracksDataInDB()
     }
 
-    private fun gotoGraph(){}
+    private fun gotoGraph(){
+        //val intent = Intent(activity, REPLACE_WITH_GRAPH_ACTIVITY::class.java)
+        //intent.putExtra("lasName", args.lasName)
+        //startActivity(intent)
+    }
 
     private fun navigateIntoTrackSettings(track: Track, index: Int) {
         val trackDataString = Json.encodeToString(track)
 
         val directions = TrackListFragmentDirections.actionTrackSetupFragmentToTrackSettingsFragment(
-            trackDataString, null, currLasName, index, track.trackName)
+                trackDataString, null, currLasName, index, track.trackName)
         view?.findNavController()?.navigate(directions)
     }
 }
