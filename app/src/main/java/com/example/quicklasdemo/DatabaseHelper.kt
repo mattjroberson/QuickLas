@@ -2,8 +2,10 @@ package com.example.quicklasdemo
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.example.quicklasdemo.data.Curve
 import com.example.quicklasdemo.data.Track
 import kotlinx.serialization.decodeFromString
@@ -15,60 +17,101 @@ class DatabaseHelper(context: Context,
                      SQLiteOpenHelper(context, DB_NAME, factory, VERSION) {
 
     override fun onCreate(db: SQLiteDatabase?) {
-        createTable(db, TABLE_TRACK_LISTS)
-        createTable(db, TABLE_CURVE_LISTS)
-        createTable(db, TABLE_TRACK_OBJECTS)
+        createTable(db, TABLE_SETTINGS)
+        createTable(db, TABLE_TEMP_TRACKS)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL("drop Table if exists $TABLE_TRACK_LISTS")
-        db?.execSQL("drop Table if exists $TABLE_CURVE_LISTS")
-        db?.execSQL("drop Table if exists $TABLE_TRACK_OBJECTS")
+        db?.execSQL("drop Table if exists $TABLE_SETTINGS")
+        db?.execSQL("drop Table if exists $TABLE_TEMP_TRACKS")
     }
 
-    fun addTrackList(name: String, table: String, dataList: MutableList<Track>) {
+    //region Add Data
+
+    fun addTrackList(name: String, dataList: MutableList<Track>) {
         val serializedList = Json.encodeToString(dataList)
-        addSerializedStringToList(name, table, serializedList)
+        addSerializedStringToList(name, TABLE_SETTINGS, serializedList)
     }
 
-    fun addCurveList(name: String, table: String, dataList: MutableList<Curve>) {
+    fun addCurveList(name: String, dataList: MutableList<Curve>) {
         val serializedList = Json.encodeToString(dataList)
-        addSerializedStringToList(name, table, serializedList)
+        addSerializedStringToList(name, TABLE_SETTINGS, serializedList)
     }
 
-    fun addTrack(name: String, table: String, track: Track) {
+    fun addLasData(tableName: String, lasData: MutableMap<String, MutableList<Float>>){
+       ensureTableCreated(tableName)
+
+        lasData.forEach(){
+            val serializedList = Json.encodeToString(it.value)
+            addSerializedStringToList(it.key, tableName, serializedList)
+        }
+    }
+
+    fun addTempTrack(name: String, track: Track) {
         val serializedData = Json.encodeToString(track)
-        addSerializedStringToList(name, table, serializedData)
+        addSerializedStringToList(name, TABLE_TEMP_TRACKS, serializedData)
     }
 
     private fun addSerializedStringToList(name: String, table: String, serializedList: String) {
         val values = ContentValues()
         values.put(COLUMN_NAME, name)
-        values.put(COLUMN_SERIALIZED_LIST, serializedList)
+        values.put(COLUMN_SERIALIZED_DATA, serializedList)
 
         val db = this.writableDatabase
         db.insert(table, null, values)
         db.close()
     }
 
-    fun getTrackList(name: String, table: String): MutableList<Track>? {
-        val serializedList = getSerializedStringFromList(name, table)
+    //endregion
+
+    //region Get Data
+
+    fun getTrackList(name: String): MutableList<Track>? {
+        val serializedList = getSerializedStringFromList(name, TABLE_SETTINGS)
 
         serializedList?.let {
             return Json.decodeFromString(it)
         }; return null
     }
 
-    fun getCurveList(name: String, table: String): MutableList<Curve>? {
-        val serializedList = getSerializedStringFromList(name, table)
+    fun getCurveList(name: String): MutableList<Curve>? {
+        val serializedList = getSerializedStringFromList(name, TABLE_SETTINGS)
 
         serializedList?.let {
             return Json.decodeFromString(it)
         }; return null
     }
 
-    fun getTrack(name: String, table: String): Track?{
-        val serializedList = getSerializedStringFromList(name, table)
+    fun getLasData(tableName: String): MutableMap<String, MutableList<Float>>? {
+        ensureTableCreated(tableName)
+
+        val query = "SELECT * FROM $tableName"
+
+        val db = this.writableDatabase
+        val cursor = db.rawQuery(query, null)
+        val lasData : MutableMap<String, MutableList<Float>> = mutableMapOf()
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast) {
+                val curveName = cursor.getString(1)
+
+                val serializedList = cursor.getString(2)
+                val curvePoints = Json.decodeFromString<MutableList<Float>>(serializedList)
+
+                lasData[curveName] = curvePoints
+                cursor.moveToNext()
+            }
+
+            cursor.close()
+            db.close()
+            return lasData
+        }
+        db.close()
+        return null
+    }
+
+    fun getTempTrack(name: String): Track?{
+        val serializedList = getSerializedStringFromList(name, TABLE_TEMP_TRACKS)
 
         serializedList?.let {
             return Json.decodeFromString(it)
@@ -92,28 +135,28 @@ class DatabaseHelper(context: Context,
         db.close()
         return null
     }
-//    fun deleteTracksList(lasName: String) : Boolean {
-//        val query = "SELECT * FROM $TABLE_TRACK_LISTS WHERE $COLUMN_NAME = \"$lasName\""
-//        var result = false
-//
-//        val db = this.writableDatabase
-//        val cursor = db.rawQuery(query, null)
-//
-//        if(cursor.moveToFirst()){
-//            db.delete(TABLE_TRACK_LISTS, "$COLUMN_NAME = ?", arrayOf(lasName))
-//            cursor.close()
-//            result = true
-//        }
-//
-//        db.close()
-//        return result
-//    }
+
+    //endregion
+
+    fun hasTable(tableName: String): Boolean{
+        val cursor: Cursor = this.writableDatabase.rawQuery(
+                ("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
+                        + tableName) + "'", null)
+
+        return cursor.count != 0;
+    }
+
+    private fun ensureTableCreated(tableName: String){
+        if(!hasTable(tableName)){
+            createTable(this.writableDatabase, tableName)
+        }
+    }
 
     private fun createTable(db: SQLiteDatabase?, tableName: String){
         val createTable = ("CREATE TABLE " + tableName + "(" +
                 COLUMN_ID + " INT PRIMARY KEY," +
                 COLUMN_NAME + " TEXT," +
-                COLUMN_SERIALIZED_LIST + " TEXT," +
+                COLUMN_SERIALIZED_DATA + " TEXT," +
                 "UNIQUE(" + COLUMN_NAME + ") ON CONFLICT REPLACE" + ")")
 
         db?.execSQL(createTable)
@@ -122,12 +165,11 @@ class DatabaseHelper(context: Context,
     companion object{
         private const val VERSION = 1
         const val DB_NAME = "LasSettingsData.db"
-        const val TABLE_TRACK_LISTS = "track_lists"
-        const val TABLE_CURVE_LISTS = "curve_lists"
-        const val TABLE_TRACK_OBJECTS = "track_objects"
+        const val TABLE_SETTINGS = "settings"
+        const val TABLE_TEMP_TRACKS = "temp_tracks"
 
         const val COLUMN_ID = "_id"
         const val COLUMN_NAME = "name"
-        const val COLUMN_SERIALIZED_LIST = "serialized_list"
+        const val COLUMN_SERIALIZED_DATA = "serialized_list"
     }
 }

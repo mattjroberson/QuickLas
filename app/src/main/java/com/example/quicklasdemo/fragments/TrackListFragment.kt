@@ -24,6 +24,9 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     private lateinit var currLasName: String
     private lateinit var args: TrackListFragmentArgs
 
+    private val trackListID
+        get() = "$currLasName.trackList"
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         args = TrackListFragmentArgs.fromBundle(requireArguments())
@@ -46,11 +49,11 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     }
 
     private fun loadTracksDataFromDB(){
-        tracksData = database.getTrackList(currLasName, DatabaseHelper.TABLE_TRACK_LISTS) ?: mutableListOf()
+        tracksData = database.getTrackList(trackListID) ?: mutableListOf()
     }
 
     private fun storeTracksDataInDB(){
-        database.addTrackList(currLasName, DatabaseHelper.TABLE_TRACK_LISTS, tracksData)
+        database.addTrackList(trackListID, tracksData)
     }
 
     private fun getDataFromSettingsFragment(){
@@ -69,7 +72,7 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
             }
         }
 
-        database.addTrackList(currLasName, DatabaseHelper.TABLE_TRACK_LISTS, tracksData)
+        storeTracksDataInDB()
     }
 
     private fun connectRecyclerViewAdapter(view : View){

@@ -5,7 +5,7 @@ import kotlinx.android.synthetic.main.item_boolean.view.*
 
 class RvBooleanItem (
     title: String,
-    private val value: Boolean,
+    private var value: Boolean,
     val actionHandler: (Boolean) -> Unit) : RvItem(title) {
 
     override fun attach(itemView: View) {

@@ -72,5 +72,38 @@
         <argument
             android:name="trackIndex"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_curveListFragment_to_curveSettingsFragment"
+            app:destination="@id/curveSettingsFragment" />
+        <argument
+            android:name="curveData"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="curveIndex"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/curveSettingsFragment"
+        android:name="com.example.quicklasdemo.fragments.CurveSettingsFragment"
+        android:label="fragment_curve_settings"
+        tools:layout="@layout/fragment_curve_settings" >
+        <action
+            android:id="@+id/action_curveSettingsFragment_to_curveListFragment"
+            app:destination="@id/curveListFragment" />
+        <argument android:name="curveData"
+            app:argType="string" />
+        <argument
+            android:name="trackName"
+            app:argType="string" />
+        <argument
+            android:name="lasName"
+            app:argType="string" />
+        <argument
+            android:name="trackIndex"
+            app:argType="integer" />
+        <argument
+            android:name="curveIndex"
+            app:argType="integer" />
     </fragment>
 </navigation>

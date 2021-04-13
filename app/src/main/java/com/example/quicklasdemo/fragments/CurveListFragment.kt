@@ -13,28 +13,30 @@ import com.example.quicklasdemo.Toolbar
 import com.example.quicklasdemo.data.Curve
 import com.example.quicklasdemo.rv_items.*
 import kotlinx.android.synthetic.main.fragment_curve_list.*
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
     private var curveItems = mutableListOf<RvCurveEntryItem>()
     private lateinit var curvesData: MutableList<Curve>
-    private lateinit var database: DatabaseHelper
+    private lateinit var db: DatabaseHelper
     private lateinit var args: CurveListFragmentArgs
 
     private val curveID
-        get() = "${args.lasName}.${args.trackName}.curves"
+        get() = "${args.lasName}.${args.trackName}.curveList"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         args = CurveListFragmentArgs.fromBundle(requireArguments())
 
-        database = DatabaseHelper(view.context, null)
+        db = DatabaseHelper(view.context, null)
 
         Toolbar(view, args.trackName, "Pick Curves",
                 R.id.toolbar_curve_list, R.menu.menu_curve_list, ::menuItemHandler)
 
         loadCurvesDataFromDB()
+
         getDataFromSettingsFragment()
 
         curvesData.forEach {
@@ -54,14 +56,20 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
     }
 
     private fun loadCurvesDataFromDB(){
-        curvesData = database.getCurveList(curveID, DatabaseHelper.TABLE_TRACK_LISTS) ?: mutableListOf()
+        curvesData = db.getCurveList(curveID) ?: readCurvesFromLas()
     }
 
-    private fun getDataFromSettingsFragment(){
+    private fun getDataFromSettingsFragment() {
+        val curveDataString = args.curveData
+        val curveIndex = args.curveIndex
 
+        curveDataString?.let {
+            val curve = Json.decodeFromString<Curve>(it)
+            curvesData[curveIndex] = curve
+        }
     }
 
-    private fun menuItemHandler(item: MenuItem): Boolean {
+        private fun menuItemHandler(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.item_go_back_to_track -> navigateBackToTrackSettings()
         }
@@ -69,26 +77,28 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
     }
 
     private fun actionHandler(item : RvCurveEntryItem){
-//        when(type){
-//            RvTrackEntryItem.Companion.ActionType.EDIT -> editTrack(item)
-//            //RvTrackEntryItem.Companion.ActionType.DELETE -> deleteTrack(item)
-//        }
+        navigateIntoCurveSettings(item.curve, curveItems.indexOf(item))
     }
 
-    private fun editTrack(item : RvTrackEntryItem) {
-        //navigateIntoTrackSettings(item.trackData, trackItems.indexOf(item))
-    }
+    private fun readCurvesFromLas(): MutableList<Curve>{
+        val lasData = db.getLasData(args.lasName)
+        val curveList = mutableListOf<Curve>()
 
-    private fun addTrack(){
-        //navigateIntoTrackSettings(Track("New Track"), -1)
+        lasData?.forEach(){
+            val curve = Curve(it.key)
+            curveList.add(curve)
+        }
+
+        return curveList
     }
 
     private fun navigateBackToTrackSettings(){
         val selectedCurves = mutableListOf<Curve>()
+        db.addCurveList(curveID, curvesData)
 
         //Only send back the curves that were selected
         curveItems.forEach {
-            if(it.isSelected) selectedCurves.add(it.curve)
+            if(it.curve.picked) selectedCurves.add(it.curve)
         }
 
         val curvesDataString = Json.encodeToString(selectedCurves)
@@ -99,13 +109,12 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
         view?.findNavController()?.navigate(directions)
     }
 
-    private fun navigateIntoTrackSettings(curve: Curve, index: Int) {
-//        val trackDataString = Json.encodeToString(track)
-//
-//        val bundle = bundleOf("modifiedTrackData" to trackDataString,
-//                "lasName" to currLasName,
-//                "trackIndex" to index)
-//
-//        view?.findNavController()?.navigate(R.id.action_trackSetupFragment_to_trackSettingsFragment, bundle)
+    private fun navigateIntoCurveSettings(curve: Curve, index: Int) {
+        val trackDataString = Json.encodeToString(curve)
+
+        val directions = CurveListFragmentDirections.actionCurveListFragmentToCurveSettingsFragment(
+                trackDataString, args.trackName,args.lasName,args.trackIndex,index)
+
+        view?.findNavController()?.navigate(directions)
     }
 }

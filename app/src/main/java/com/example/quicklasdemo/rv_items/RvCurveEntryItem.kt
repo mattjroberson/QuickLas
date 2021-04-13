@@ -8,19 +8,17 @@ class RvCurveEntryItem(
         val curve : Curve,
         val actionHandler : (item : RvCurveEntryItem) -> Unit) : RvItem(curve.curveName){
 
-    val isSelected = curve.isSelected;
-
     override fun attach(itemView : View){
         itemView.apply{
             curve_name.text = title
-            curve_selected.isSelected = isSelected
+            curve_selected.isChecked = curve.picked
 
             curve_selected.setOnClickListener() {
-                isSelected = it.isSelected
+                curve.picked = curve_selected.isChecked
             }
 
             edit_curve_button.setOnClickListener {
-                //actionHandler(this@RvCurveEntryItem, ActionType.EDIT)
+                actionHandler(this@RvCurveEntryItem)
             }
         }
     }

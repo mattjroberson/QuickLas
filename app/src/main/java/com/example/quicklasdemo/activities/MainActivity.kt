@@ -10,6 +10,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.navigation.findNavController
+import com.example.quicklasdemo.DatabaseHelper
+import com.example.quicklasdemo.LasParser
 import com.example.quicklasdemo.R
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.serialization.encodeToString
@@ -18,11 +20,13 @@ import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(R.layout.activity_main) {
+
+    private lateinit var db: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        db = DatabaseHelper(this.applicationContext, null)
 
         iv_file_selector.setOnClickListener() { _ -> openFile() }
     }
@@ -30,10 +34,14 @@ class MainActivity : AppCompatActivity() {
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.also { uri ->
-                //TODO: Pass raw las on to app somehow
-                val lasFileData = readTextFromUri(uri)
 
                 val lasName = uri.lastPathSegment!!.split("/")[1].split(".")[0]
+
+                //Read LAS from file if not already in a database
+                if(!db.hasTable(lasName)){
+                    readLasDataIntoDB(lasName, uri)
+                }
+
                 launchTrackSettingsActivity(lasName)
             }
         }
@@ -52,6 +60,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         startForResult.launch(intent)
+    }
+
+    private fun readLasDataIntoDB(lasName: String, uri: Uri){
+        val lasFileData = readTextFromUri(uri)
+        val curves = LasParser.parse(lasFileData)
+
+        db.addLasData(lasName, curves);
     }
 
     @Throws(IOException::class)

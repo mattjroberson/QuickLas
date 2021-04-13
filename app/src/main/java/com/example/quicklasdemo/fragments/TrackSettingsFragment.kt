@@ -31,8 +31,8 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
 
         args = TrackSettingsFragmentArgs.fromBundle(requireArguments())
 
-        Toolbar(view, "Well Name", "Track Settings",
-            R.id.toolbar_track_settings, R.menu.menu_track_settings, ::menuItemHandler)
+        Toolbar(view, args.trackName, "Track Settings",
+            R.id.toolbar_track_settings, R.menu.menu_settings, ::menuItemHandler)
 
         importTrackData()
         loadDataFromCurveListFragment()
@@ -59,13 +59,12 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
     }
 
     private fun importTrackData(){
-        val trackID = "${args.lasName}.${args.trackName}.curves"
+        val trackID = "${args.lasName}.${args.trackName}"
 
         trackData = if(args.trackData != null) {
             Json.decodeFromString(args.trackData!!)
         }else{
-            Log.i("TEST", trackID)
-            db.getTrack(trackID, DatabaseHelper.TABLE_TRACK_OBJECTS)!!
+            db.getTempTrack(trackID)!!
         }
 
         oldTrackData = trackData.copy()
@@ -88,11 +87,12 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
 
     private fun navigateToCurveList(){
         val directions = TrackSettingsFragmentDirections.actionTrackSettingsFragmentToCurveListFragment(
-                trackData.trackName, args.lasName, args.trackIndex
+                trackData.trackName, args.lasName, args.trackIndex, null, -1
         )
 
-        val trackID = "${args.lasName}.${trackData.trackName}.curves"
-        db.addTrack(trackID, DatabaseHelper.TABLE_TRACK_OBJECTS, trackData)
+        val trackID = "${args.lasName}.${trackData.trackName}"
+        db.addTempTrack(trackID, trackData)
+
         view?.findNavController()?.navigate(directions)
     }
 
