@@ -4,18 +4,13 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
-import androidx.navigation.findNavController
 import com.example.quicklasdemo.DatabaseHelper
 import com.example.quicklasdemo.LasParser
 import com.example.quicklasdemo.R
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
@@ -35,7 +30,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.also { uri ->
 
-                val lasName = uri.lastPathSegment!!.split("/")[1].split(".")[0]
+                val lasName = uri.path!!.substringAfterLast("/").split(".")[0]
 
                 //Read LAS from file if not already in a database
                 if(!db.hasTable(lasName)){

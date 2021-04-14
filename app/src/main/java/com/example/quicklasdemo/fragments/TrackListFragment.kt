@@ -2,6 +2,7 @@ package com.example.quicklasdemo.fragments
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -47,6 +48,7 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     }
 
     private fun loadTracksDataFromDB(){
+        Log.i("TEST", currLasName)
         tracksData = database.getTrackList(currLasName) ?: mutableListOf()
     }
 

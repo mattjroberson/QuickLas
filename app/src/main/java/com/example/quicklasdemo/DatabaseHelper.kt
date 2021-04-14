@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
 import com.example.quicklasdemo.data.Curve
 import com.example.quicklasdemo.data.Track
 import kotlinx.serialization.decodeFromString
@@ -29,7 +28,7 @@ class DatabaseHelper(context: Context):
 
     fun addTrackList(name: String, dataList: MutableList<Track>) {
         val serializedList = Json.encodeToString(dataList)
-        addSerializedStringToList(name, TABLE_SETTINGS, serializedList)
+        addSerializedStringToList("$name.trackList", TABLE_SETTINGS, serializedList)
     }
 
     fun addCurveList(name: String, dataList: MutableList<Curve>) {
@@ -57,7 +56,7 @@ class DatabaseHelper(context: Context):
         values.put(COLUMN_SERIALIZED_DATA, serializedList)
 
         val db = this.writableDatabase
-        db.insert(table, null, values)
+        db.insert("'$table'", null, values)
         db.close()
     }
 
@@ -84,7 +83,7 @@ class DatabaseHelper(context: Context):
     fun getLasData(lasName: String): MutableMap<String, MutableList<Float>>? {
         ensureTableCreated(lasName)
 
-        val query = "SELECT * FROM $lasName"
+        val query = "SELECT * FROM '$lasName'"
 
         val db = this.writableDatabase
         val cursor = db.rawQuery(query, null)
@@ -118,7 +117,7 @@ class DatabaseHelper(context: Context):
     }
 
     private fun getSerializedStringFromList(name: String, table: String): String? {
-        val query = "SELECT * FROM $table WHERE $COLUMN_NAME = \"$name\""
+        val query = "SELECT * FROM '$table' WHERE $COLUMN_NAME = \"$name\""
         val db = this.writableDatabase
         val cursor = db.rawQuery(query, null)
         lateinit var serializedList: String
@@ -152,7 +151,7 @@ class DatabaseHelper(context: Context):
     }
 
     private fun createTable(db: SQLiteDatabase?, tableName: String){
-        val createTable = ("CREATE TABLE " + tableName + "(" +
+        val createTable = ("CREATE TABLE '" + tableName + "'(" +
                 COLUMN_ID + " INT PRIMARY KEY," +
                 COLUMN_NAME + " TEXT," +
                 COLUMN_SERIALIZED_DATA + " TEXT," +
