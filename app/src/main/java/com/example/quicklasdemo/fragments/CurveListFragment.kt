@@ -31,8 +31,6 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
         super.onViewCreated(view, savedInstanceState)
         args = CurveListFragmentArgs.fromBundle(requireArguments())
 
-        Log.i("TEST", "Git test")
-
         db = DatabaseHelper(view.context)
 
         Toolbar(view, args.trackName, "Pick Curves",
