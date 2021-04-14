@@ -1,6 +1,7 @@
 package com.example.quicklasdemo.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -29,6 +30,8 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         args = CurveListFragmentArgs.fromBundle(requireArguments())
+
+        Log.i("TEST", "Git test")
 
         db = DatabaseHelper(view.context)
 
