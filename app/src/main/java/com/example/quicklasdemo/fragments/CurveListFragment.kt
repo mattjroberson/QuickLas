@@ -33,6 +33,8 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
 
         db = DatabaseHelper(view.context)
 
+        Log.i("TEST", "TEST")
+
         Toolbar(view, args.trackName, "Pick Curves",
                 R.id.toolbar_curve_list, R.menu.menu_curve_list, ::menuItemHandler)
 
