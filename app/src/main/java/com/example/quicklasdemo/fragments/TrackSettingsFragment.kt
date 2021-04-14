@@ -1,7 +1,6 @@
 package com.example.quicklasdemo.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -45,9 +44,9 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
             RvBooleanItem("Show Grid",
                     trackData.showGrid) { trackData.showGrid = it },
             RvNumberFieldItem("Vertical Divider Count",
-                    trackData.verticalDivCount) { trackData.verticalDivCount = it },
+                    trackData.verticalDivCount) { trackData.verticalDivCount = it.toInt()},
             RvNumberFieldItem("Horizontal Divider Height (ft)",
-                    trackData.horizontalDivHeight) { trackData.horizontalDivHeight = it }
+                    trackData.horizontalDivHeight) { trackData.horizontalDivHeight = it.toInt()}
         )
 
         val trackSettingsAdapter = RvAdapter(trackList, view)

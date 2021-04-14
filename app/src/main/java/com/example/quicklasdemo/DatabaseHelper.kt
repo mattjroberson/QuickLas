@@ -39,7 +39,7 @@ class DatabaseHelper(context: Context):
     fun addLasData(tableName: String, lasData: MutableMap<String, MutableList<Float>>){
        ensureTableCreated(tableName)
 
-        lasData.forEach(){
+        lasData.forEach{
             val serializedList = Json.encodeToString(it.value)
             addSerializedStringToList(it.key, tableName, serializedList)
         }
@@ -141,7 +141,7 @@ class DatabaseHelper(context: Context):
                 ("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
                         + tableName) + "'", null)
 
-        return cursor.count != 0;
+        return cursor.count != 0
     }
 
     private fun ensureTableCreated(tableName: String){

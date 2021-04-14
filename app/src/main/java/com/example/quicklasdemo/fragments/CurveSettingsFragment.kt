@@ -1,6 +1,7 @@
 package com.example.quicklasdemo.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -33,17 +34,10 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
                 R.id.toolbar_curve_settings, R.menu.menu_settings, ::menuItemHandler)
 
         val curveList: MutableList<RvItem> = mutableListOf(
-//                RvTextFieldItem(trackData.trackName) { trackData.trackName = it },
-//                RvClickableItem("Curves") { navigateToCurveList() },
-//                RvBooleanItem("Display Linear Graph",
-//                        trackData.isLinear) { trackData.isLinear = it },
-//                RvBooleanItem("Show Grid",
-//                        trackData.showGrid) { trackData.showGrid = it },
-//                RvNumberFieldItem("Vertical Divider Count",
-//                        trackData.verticalDivCount) { trackData.verticalDivCount = it },
-//                RvNumberFieldItem("Horizontal Divider Height (ft)",
-//                        trackData.horizontalDivHeight) { trackData.horizontalDivHeight = it }
-        )
+                RvDropdownItem("Line Style", R.array.line_style) { },
+                RvDropdownItem("Line Color", R.array.colors, getCurrColorIndex()) { setColor(it) },
+                RvNumberFieldItem("Scale Min", curveData.scaleMin) { curveData.scaleMin = it.toFloat()},
+                RvNumberFieldItem("Scale Max", curveData.scaleMax) { curveData.scaleMax = it.toFloat()})
 
         val trackSettingsAdapter = RvAdapter(curveList, view)
 
@@ -69,5 +63,32 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
         )
 
         view?.findNavController()?.navigate(directions)
+    }
+
+    //TODO: Refactor into a dictionary for scale and generic use
+    private fun setColor(color: String){
+        curveData.apply{
+            curveColor = when(color){
+                "Red" -> "FF0000"
+                "Blue" -> "00FF00"
+                "Green" -> "0000FF"
+                else -> "000000"
+            }
+        }
+        Log.i("TEST", curveData.curveColor)
+
+    }
+
+    private fun getCurrColorIndex(): Int{
+        val colors = resources.getStringArray(R.array.colors)
+
+        curveData.curveColor.also{
+            when(it){
+                "FF0000" -> return colors.indexOf("Red")
+                "00FF00" -> return colors.indexOf("Blue")
+                "0000FF" -> return colors.indexOf("Green")
+            }
+        }
+        return -1
     }
 }

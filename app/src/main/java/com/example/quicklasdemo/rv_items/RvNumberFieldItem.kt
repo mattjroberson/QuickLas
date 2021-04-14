@@ -8,8 +8,8 @@ import kotlinx.android.synthetic.main.item_number_field.view.*
 
 class RvNumberFieldItem(
         title: String,
-        private val value: Int,
-        val actionHandler: (Int) -> Unit) : RvItem(title) {
+        private val value: Any,
+        val actionHandler: (String) -> Unit) : RvItem(title) {
 
     override fun attach(itemView: View) {
         itemView.edit_number_title.text = title
@@ -22,7 +22,7 @@ class RvNumberFieldItem(
                     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(windowToken, 0)
 
-                    actionHandler(Integer.parseInt(text.toString()))
+                    actionHandler(text.toString())
                     true
                 } else {
                     false
