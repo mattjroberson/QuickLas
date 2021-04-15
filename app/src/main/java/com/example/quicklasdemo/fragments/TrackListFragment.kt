@@ -1,39 +1,34 @@
 package com.example.quicklasdemo.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.quicklasdemo.DatabaseHelper
-import com.example.quicklasdemo.R
-import com.example.quicklasdemo.RvAdapter
-import com.example.quicklasdemo.Toolbar
+import com.example.quicklasdemo.*
 import com.example.quicklasdemo.data.Track
 import com.example.quicklasdemo.rv_items.RvTrackEntryItem
 import kotlinx.android.synthetic.main.fragment_track_list.*
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     private var trackItems = mutableListOf<RvTrackEntryItem>()
     private lateinit var tracksData: MutableList<Track>
-    private lateinit var database: DatabaseHelper
-    private lateinit var currLasName: String
     private lateinit var args: TrackListFragmentArgs
+    private lateinit var db: DatabaseHelper
+
+    companion object{
+        const val MAX_TRACK_COUNT = 4
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         args = TrackListFragmentArgs.fromBundle(requireArguments())
+        db = DatabaseHelper(view.context)
 
-        currLasName = args.lasName
-
-        database = DatabaseHelper(view.context)
-
-        Toolbar(view, currLasName, "Pick Tracks",
+        Toolbar(view, args.lasName, "Pick Tracks",
                 R.id.toolbar_track_list, R.menu.menu_track_list, ::menuItemHandler)
 
         loadTracksDataFromDB()
@@ -47,22 +42,18 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     }
 
     private fun loadTracksDataFromDB(){
-        Log.i("TEST", currLasName)
-        tracksData = database.getTrackList(currLasName) ?: mutableListOf()
+        tracksData = db.getTrackList(args.lasName) ?: mutableListOf()
     }
 
     private fun storeTracksDataInDB(){
-        database.addTrackList(currLasName, tracksData)
+        db.addTrackList(args.lasName, tracksData)
     }
 
     private fun getDataFromSettingsFragment(){
-        if(!args.saveSettings) return
-
-        val trackDataString = args.trackData
-        val trackIndex = args.trackIndex
-
-        trackDataString?.let {
+        args.trackData?.let {
+            val trackIndex = args.trackIndex
             val track = Json.decodeFromString<Track>(it)
+
             //If index is not -1 (new track) replace old reference
             if (trackIndex != -1) {
                 tracksData[trackIndex] = track
@@ -100,12 +91,17 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
 
     private fun editTrack(item: RvTrackEntryItem) {
         storeTracksDataInDB()
-        navigateIntoTrackSettings(item.trackData, trackItems.indexOf(item))
+        navigateIntoTrackSettings(item.trackData.trackName, trackItems.indexOf(item))
     }
 
     private fun addTrack(){
-        storeTracksDataInDB()
-        navigateIntoTrackSettings(Track("New Track"), -1)
+        if(tracksData.size < MAX_TRACK_COUNT){
+            storeTracksDataInDB()
+            navigateIntoTrackSettings("New Track", -1)
+        }
+        else{
+            Utils.printMessage(view?.context,"Only $MAX_TRACK_COUNT tracks allowed")
+        }
     }
 
     private fun deleteTrack(item: RvTrackEntryItem) {
@@ -124,16 +120,20 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
     }
 
     private fun gotoGraph(){
-        //val intent = Intent(activity, REPLACE_WITH_GRAPH_ACTIVITY::class.java)
-        //intent.putExtra("lasName", args.lasName)
-        //startActivity(intent)
+        if(tracksData.size > 0) {
+            //val intent = Intent(activity, REPLACE_WITH_GRAPH_ACTIVITY::class.java)
+            //intent.putExtra("lasName", args.lasName)
+            //startActivity(intent)
+        }
+        else{
+            Utils.printMessage(view?.context,"Must have at least one track")
+        }
     }
 
-    private fun navigateIntoTrackSettings(track: Track, index: Int) {
-        val trackDataString = Json.encodeToString(track)
+    private fun navigateIntoTrackSettings(trackName: String, index: Int) {
 
         val directions = TrackListFragmentDirections.actionTrackSetupFragmentToTrackSettingsFragment(
-                trackDataString, null, currLasName, index, track.trackName)
+                null, args.lasName, index, trackName)
         view?.findNavController()?.navigate(directions)
     }
 }

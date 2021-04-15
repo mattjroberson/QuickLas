@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         super.onCreate(savedInstanceState)
         db = DatabaseHelper(this.applicationContext)
 
-        iv_file_selector.setOnClickListener() { _ -> openFile() }
+        iv_file_selector.setOnClickListener{ _ -> openFile() }
     }
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         val lasFileData = readTextFromUri(uri)
         val curves = LasParser.parse(lasFileData)
 
-        db.addLasData(lasName, curves);
+        db.addLasData(lasName, curves)
     }
 
     @Throws(IOException::class)

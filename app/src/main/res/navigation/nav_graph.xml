@@ -17,9 +17,6 @@
             android:name="lasName"
             app:argType="string" />
         <argument
-            android:name="saveSettings"
-            app:argType="boolean" />
-        <argument
             android:name="trackData"
             app:argType="string"
             app:nullable="true" />
@@ -38,10 +35,6 @@
         <action
             android:id="@+id/action_trackSettingsFragment_to_curveListFragment"
             app:destination="@id/curveListFragment" />
-        <argument
-            android:name="trackData"
-            app:argType="string"
-            app:nullable="true" />
         <argument
             android:name="selectedCurves"
             app:argType="string"

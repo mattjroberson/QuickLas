@@ -6,10 +6,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.quicklasdemo.DatabaseHelper
-import com.example.quicklasdemo.R
-import com.example.quicklasdemo.RvAdapter
-import com.example.quicklasdemo.Toolbar
+import com.example.quicklasdemo.*
 import com.example.quicklasdemo.data.Curve
 import com.example.quicklasdemo.data.Track
 import com.example.quicklasdemo.rv_items.*
@@ -19,34 +16,41 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
+    private lateinit var tracksList: MutableList<Track>
     private lateinit var trackData : Track
-    private lateinit var oldTrackData : Track
     private lateinit var db : DatabaseHelper
+    private lateinit var toolbar : Toolbar
     private lateinit var args: TrackSettingsFragmentArgs
+
+    companion object {
+        private const val VERT_DIV_COUNT_MIN = 0
+        private const val VERT_DIV_COUNT_MAX = 10
+        private const val HOR_DIV_HEIGHT_MIN = 0
+        private const val HOR_DIV_HEIGHT_MAX = 10
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        args = TrackSettingsFragmentArgs.fromBundle(requireArguments())
         db = DatabaseHelper(view.context)
 
-        args = TrackSettingsFragmentArgs.fromBundle(requireArguments())
-
-        Toolbar(view, args.trackName, "Track Settings",
+        toolbar = Toolbar(view, args.trackName, "Track Settings",
             R.id.toolbar_track_settings, R.menu.menu_settings, ::menuItemHandler)
 
-        importTrackData()
+        loadTrackDataFromDB()
         loadDataFromCurveListFragment()
 
         val trackList = mutableListOf(
-            RvTextFieldItem(trackData.trackName) { trackData.trackName = it },
+            RvTextFieldItem(trackData.trackName) { actionHandlerTrackName(it) },
             RvClickableItem("Curves") { navigateToCurveList() },
             RvBooleanItem("Display Linear Graph",
                     trackData.isLinear) { trackData.isLinear = it },
             RvBooleanItem("Show Grid",
                     trackData.showGrid) { trackData.showGrid = it },
             RvNumberFieldItem("Vertical Divider Count",
-                    trackData.verticalDivCount) { trackData.verticalDivCount = it.toInt()},
+                    trackData.verticalDivCount) { actionHandlerDivCount(it.toInt()) },
             RvNumberFieldItem("Horizontal Divider Height (ft)",
-                    trackData.horizontalDivHeight) { trackData.horizontalDivHeight = it.toInt()}
+                    trackData.horizontalDivHeight) { actionHandlerDivHeight(it.toInt()) }
         )
 
         val trackSettingsAdapter = RvAdapter(trackList, view)
@@ -57,16 +61,11 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
         }
     }
 
-    private fun importTrackData(){
-        val trackID = "${args.lasName}.${args.trackName}"
+    private fun loadTrackDataFromDB(){
+        tracksList =  db.getTrackList(args.lasName) ?: mutableListOf()
 
-        trackData = if(args.trackData != null) {
-            Json.decodeFromString(args.trackData!!)
-        }else{
-            db.getTempTrack(trackID)!!
-        }
-
-        oldTrackData = trackData.copy()
+        trackData = if(args.trackIndex == -1) Track(args.trackName)
+                    else tracksList[args.trackIndex]
     }
 
     private fun loadDataFromCurveListFragment(){
@@ -78,8 +77,8 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
 
     private fun menuItemHandler(item: MenuItem): Boolean {
         when(item.itemId){
-            R.id.item_save_changes -> navigateBackToTrackConfig(trackData, true)
-            R.id.item_dont_save_changes -> navigateBackToTrackConfig(oldTrackData, false)
+            R.id.item_save_changes -> navigateBackToTrackConfig(trackData)
+            R.id.item_dont_save_changes -> navigateBackToTrackConfig(null)
         }
         return true
     }
@@ -95,13 +94,52 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
         view?.findNavController()?.navigate(directions)
     }
 
-    private fun navigateBackToTrackConfig(track: Track, save: Boolean) {
-        val trackDataString = Json.encodeToString(track)
+    private fun navigateBackToTrackConfig(track: Track?) {
+        val trackDataString = if(track != null) Json.encodeToString(track) else null
 
         val directions = TrackSettingsFragmentDirections.actionTrackSettingsFragmentToTrackSetupFragment(
-            args.lasName, save, trackDataString, args.trackIndex
+            args.lasName, trackDataString, args.trackIndex
         )
 
         view?.findNavController()?.navigate(directions)
     }
+
+    private fun actionHandlerTrackName(value: String): Boolean{
+        if(value == ""){
+            Utils.printMessage(view?.context,"Track Name cant be empty")
+            return false
+        }
+        tracksList.forEach {
+            if(it.trackName == value){
+                Utils.printMessage(view?.context,"Track name $value is already taken")
+                return false
+            }
+        }
+
+        trackData.trackName = value
+        toolbar.setTitle(value)
+        return true
+    }
+
+    private fun actionHandlerDivCount(value: Int):Boolean{
+        //Only accept values in true, return result back to itemview
+        if(value in (VERT_DIV_COUNT_MIN + 1) until VERT_DIV_COUNT_MAX){
+            trackData.verticalDivCount = value
+            return true
+        }
+        Utils.printMessage(view?.context,"Value must be greater than $VERT_DIV_COUNT_MIN amd less than $VERT_DIV_COUNT_MAX")
+        return false
+    }
+
+    private fun actionHandlerDivHeight(value: Int):Boolean{
+        //Only accept values in true, return result back to item view
+        if(value in (HOR_DIV_HEIGHT_MIN + 1) until HOR_DIV_HEIGHT_MAX){
+            trackData.horizontalDivHeight = value
+            return true
+        }
+        Utils.printMessage(view?.context, "Value must be greater than $HOR_DIV_HEIGHT_MIN amd less than $HOR_DIV_HEIGHT_MAX")
+        return false
+    }
+
+
 }
