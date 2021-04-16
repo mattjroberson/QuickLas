@@ -91,13 +91,13 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
 
     private fun editTrack(item: RvTrackEntryItem) {
         storeTracksDataInDB()
-        navigateIntoTrackSettings(item.trackData.trackName, trackItems.indexOf(item))
+        navigateIntoTrackSettings(trackItems.indexOf(item))
     }
 
     private fun addTrack(){
         if(tracksData.size < MAX_TRACK_COUNT){
             storeTracksDataInDB()
-            navigateIntoTrackSettings("New Track", -1)
+            navigateIntoTrackSettings(-1)
         }
         else{
             Utils.printMessage(view?.context,"Only $MAX_TRACK_COUNT tracks allowed")
@@ -130,10 +130,10 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
         }
     }
 
-    private fun navigateIntoTrackSettings(trackName: String, index: Int) {
+    private fun navigateIntoTrackSettings(index: Int) {
 
         val directions = TrackListFragmentDirections.actionTrackSetupFragmentToTrackSettingsFragment(
-                null, args.lasName, index, trackName)
+                null, args.lasName, index, -1)
         view?.findNavController()?.navigate(directions)
     }
 }

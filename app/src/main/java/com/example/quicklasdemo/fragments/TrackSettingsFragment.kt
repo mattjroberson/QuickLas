@@ -34,11 +34,12 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
         args = TrackSettingsFragmentArgs.fromBundle(requireArguments())
         db = DatabaseHelper(view.context)
 
-        toolbar = Toolbar(view, args.trackName, "Track Settings",
-            R.id.toolbar_track_settings, R.menu.menu_settings, ::menuItemHandler)
-
         loadTrackDataFromDB()
         loadDataFromCurveListFragment()
+
+        toolbar = Toolbar(view, trackData.trackName, "Track Settings",
+            R.id.toolbar_track_settings, R.menu.menu_settings, ::menuItemHandler)
+
 
         val trackList = mutableListOf(
             RvTextFieldItem(trackData.trackName) { actionHandlerTrackName(it) },
@@ -61,11 +62,15 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
         }
     }
 
-    private fun loadTrackDataFromDB(){
-        tracksList =  db.getTrackList(args.lasName) ?: mutableListOf()
+    private fun loadTrackDataFromDB() {
+        tracksList = db.getTrackList(args.lasName) ?: mutableListOf()
 
-        trackData = if(args.trackIndex == -1) Track(args.trackName)
-                    else tracksList[args.trackIndex]
+        if (args.trackIndex == -1) {
+            val trackID = "${args.lasName}.${args.trackID}"
+            trackData = db.getTempTrack(trackID) ?: Track(createNewTrackName())
+        } else {
+            trackData = tracksList[args.trackIndex]
+        }
     }
 
     private fun loadDataFromCurveListFragment(){
@@ -85,10 +90,10 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
 
     private fun navigateToCurveList(){
         val directions = TrackSettingsFragmentDirections.actionTrackSettingsFragmentToCurveListFragment(
-                trackData.trackName, args.lasName, args.trackIndex, null, -1
+                args.lasName, args.trackIndex, null, -1, trackData.trackName, trackData.uniqueID
         )
 
-        val trackID = "${args.lasName}.${trackData.trackName}"
+        val trackID = "${args.lasName}.${trackData.uniqueID}"
         db.addTempTrack(trackID, trackData)
 
         view?.findNavController()?.navigate(directions)
@@ -141,5 +146,15 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
         return false
     }
 
+    //Recursive function to ensure new track names are unique (New Track, New Track 1, New Track 2...)
+    private fun createNewTrackName(index: Int = 0): String{
+        val name = if(index == 0) "New Track" else "New Track $index"
 
+        tracksList.forEach {
+            if(it.trackName == name){
+                return createNewTrackName(index+1)
+            }
+        }
+        return name
+    }
 }

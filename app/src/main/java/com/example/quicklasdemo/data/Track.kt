@@ -9,4 +9,5 @@ data class Track (
         var showGrid: Boolean = false,
         var isLinear: Boolean = true,
         var verticalDivCount: Int = 3,
-        var horizontalDivHeight: Int = 5)
+        var horizontalDivHeight: Int = 5,
+        var uniqueID: Long = System.currentTimeMillis())

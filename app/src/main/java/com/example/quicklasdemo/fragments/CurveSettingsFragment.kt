@@ -1,7 +1,6 @@
 package com.example.quicklasdemo.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -65,11 +64,10 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
     }
 
     private fun navigateBackToCurveConfig(curve: Curve? = null) {
-        Log.i("TEST", curveData.curveColor)
         val curveDataString = if(curve != null) Json.encodeToString(curve) else null
 
         val directions = CurveSettingsFragmentDirections.actionCurveSettingsFragmentToCurveListFragment(
-                args.trackName, args.lasName, args.trackIndex, curveDataString, args.curveIndex
+                args.lasName, args.trackIndex, curveDataString, args.curveIndex, args.trackName, args.trackID
         )
 
         view?.findNavController()?.navigate(directions)
@@ -87,8 +85,6 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
     }
     //TODO: THERE IS A BUG IN GET CURR INDEX FOR DROPDOWN!!!
     private fun getCurrColorIndex(): Int {
-        Log.i("TEST", curveData.curveColor)
-
         val colors = resources.getStringArray(R.array.colors)
 
         colorList.forEach {

@@ -23,6 +23,9 @@
         <argument
             android:name="trackIndex"
             app:argType="integer" />
+        <action
+            android:id="@+id/action_trackSetupFragment_to_graphListFragment"
+            app:destination="@id/graphListFragment" />
     </fragment>
     <fragment
         android:id="@+id/trackSettingsFragment"
@@ -46,8 +49,8 @@
             android:name="trackIndex"
             app:argType="integer" />
         <argument
-            android:name="trackName"
-            app:argType="string" />
+            android:name="trackID"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/curveListFragment"
@@ -57,9 +60,6 @@
         <action
             android:id="@+id/action_curveListFragment_to_trackSettingsFragment"
             app:destination="@id/trackSettingsFragment" />
-        <argument
-            android:name="trackName"
-            app:argType="string" />
         <argument android:name="lasName"
             app:argType="string" />
         <argument
@@ -75,6 +75,12 @@
         <argument
             android:name="curveIndex"
             app:argType="integer" />
+        <argument
+            android:name="trackName"
+            app:argType="string" />
+        <argument
+            android:name="trackID"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/curveSettingsFragment"
@@ -87,9 +93,6 @@
         <argument android:name="curveData"
             app:argType="string" />
         <argument
-            android:name="trackName"
-            app:argType="string" />
-        <argument
             android:name="lasName"
             app:argType="string" />
         <argument
@@ -98,5 +101,20 @@
         <argument
             android:name="curveIndex"
             app:argType="integer" />
+        <argument
+            android:name="trackName"
+            app:argType="string" />
+        <argument
+            android:name="trackID"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/graphListFragment"
+        android:name="com.example.quicklasdemo.fragments.GraphListFragment"
+        android:label="fragment_graph_list"
+        tools:layout="@layout/fragment_graph_list" >
+        <action
+            android:id="@+id/action_graphListFragment_to_trackSetupFragment"
+            app:destination="@id/trackSetupFragment" />
     </fragment>
 </navigation>
