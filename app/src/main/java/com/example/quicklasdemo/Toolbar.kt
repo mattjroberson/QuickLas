@@ -5,22 +5,24 @@ import android.view.View
 import androidx.appcompat.widget.Toolbar
 
 class Toolbar (
-    private val view: View,
+    view: View,
     private val titleText: String,
     private val subtitleText: String,
-    private val toolbarId: Int,
+    toolbarId: Int,
     private val menuId: Int,
     private val clickHandler: (MenuItem) -> Boolean) {
 
-    init{
-        view?.findViewById<Toolbar>(toolbarId)?.run {
-            inflateMenu(menuId)
-            title = titleText
-            subtitle = subtitleText
+    private var toolbar: Toolbar? = view.findViewById<Toolbar>(toolbarId)?.apply {
+        inflateMenu(menuId)
+        title = titleText
+        subtitle = subtitleText
 
-            setOnMenuItemClickListener(){
-                    item -> clickHandler(item)
-            }
+        setOnMenuItemClickListener{
+                item -> clickHandler(item)
         }
+    }
+
+    fun setTitle(newTitle: String){
+        toolbar?.title = newTitle
     }
 }

@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Curve(var curveName: String = "Default Name",
-                 val lineStyle: String = "Default Style",
+                 var lineStyle: String = "Default Style",
                  var curveColor: String = "000000",
                  var scaleMin: Float = .1f,
                  var scaleMax: Float = 1.0f,

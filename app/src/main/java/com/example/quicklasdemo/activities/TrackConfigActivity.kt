@@ -20,10 +20,10 @@ class TrackConfigActivity : AppCompatActivity(R.layout.activity_track_config){
 
         val lasName = intent.getStringExtra("lasName")
 
-        val bundle = bundleOf("lasName" to lasName,
-            "saveSettings" to false,
-            "trackData" to null,
-            "trackIndex" to -1)
+        val bundle = bundleOf(
+                "lasName" to lasName,
+                "trackData" to null,
+                "trackIndex" to -1)
 
         findNavController(R.id.nav_host_fragment_container)
                 .setGraph(R.navigation.nav_graph, bundle)

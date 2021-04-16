@@ -1,7 +1,6 @@
 package com.example.quicklasdemo.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -25,21 +24,17 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
     private lateinit var args: CurveListFragmentArgs
 
     private val curveID
-        get() = "${args.lasName}.${args.trackName}.curveList"
+        get() = "${args.lasName}.${args.trackID}.curveList"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         args = CurveListFragmentArgs.fromBundle(requireArguments())
-
         db = DatabaseHelper(view.context)
-
-        Log.i("TEST", "TEST")
 
         Toolbar(view, args.trackName, "Pick Curves",
                 R.id.toolbar_curve_list, R.menu.menu_curve_list, ::menuItemHandler)
 
         loadCurvesDataFromDB()
-
         getDataFromSettingsFragment()
 
         curvesData.forEach {
@@ -87,7 +82,7 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
         val lasData = db.getLasData(args.lasName)
         val curveList = mutableListOf<Curve>()
 
-        lasData?.forEach(){
+        lasData?.forEach{
             val curve = Curve(it.key)
             curveList.add(curve)
         }
@@ -107,16 +102,16 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
         val curvesDataString = Json.encodeToString(selectedCurves)
 
         val directions = CurveListFragmentDirections.actionCurveListFragmentToTrackSettingsFragment(
-            null, curvesDataString, args.lasName, args.trackIndex, args.trackName
+            curvesDataString, args.lasName, args.trackIndex, args.trackID
         )
         view?.findNavController()?.navigate(directions)
     }
 
     private fun navigateIntoCurveSettings(curve: Curve, index: Int) {
-        val trackDataString = Json.encodeToString(curve)
+        val curveDataString = Json.encodeToString(curve)
 
         val directions = CurveListFragmentDirections.actionCurveListFragmentToCurveSettingsFragment(
-                trackDataString, args.trackName,args.lasName,args.trackIndex,index)
+                curveDataString,args.lasName,args.trackIndex,index,args.trackName,args.trackID)
 
         view?.findNavController()?.navigate(directions)
     }
