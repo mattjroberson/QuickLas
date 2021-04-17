@@ -5,11 +5,13 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.widget.Toast
 import com.example.quicklasdemo.data.Curve
 import com.example.quicklasdemo.data.Track
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+
 
 class DatabaseHelper(context: Context):
                      SQLiteOpenHelper(context, DB_NAME, null, VERSION) {
@@ -136,12 +138,33 @@ class DatabaseHelper(context: Context):
 
     //endregion
 
+    fun getGraphNames(): MutableList<String>{
+        val cursor: Cursor = this.writableDatabase.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null)
+        val graphNames = mutableListOf<String>()
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast) {
+                val name = cursor.getString(0)
+                if(name != TABLE_SETTINGS && name != TABLE_TEMP_TRACKS && name != "android_metadata") {
+                    graphNames.add(name)
+                }
+                cursor.moveToNext()
+            }
+        }
+
+        return graphNames
+    }
+
     fun hasTable(tableName: String): Boolean{
         val cursor: Cursor = this.writableDatabase.rawQuery(
                 ("select DISTINCT tbl_name from sqlite_master where tbl_name = '"
                         + tableName) + "'", null)
 
         return cursor.count != 0
+    }
+
+    fun deleteTable(tableName: String){
+        this.writableDatabase.execSQL("drop Table if exists '$tableName'")
     }
 
     private fun ensureTableCreated(tableName: String){

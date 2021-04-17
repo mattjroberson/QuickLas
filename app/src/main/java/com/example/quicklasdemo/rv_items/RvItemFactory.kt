@@ -8,7 +8,7 @@ class RvItemFactory {
         fun getItemViewType(item : RvItem): Int {
             when(item) {
                 is RvClickableItem -> return 0;
-                is RvTrackEntryItem -> return 1;
+                is RvEntryItem -> return 1;
                 is RvTextFieldItem -> return 2;
                 is RvBooleanItem -> return 3;
                 is RvNumberFieldItem -> return 4;
