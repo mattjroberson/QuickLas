@@ -1,6 +1,7 @@
 package com.example.quicklasdemo.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -24,7 +25,7 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
     private lateinit var args: CurveListFragmentArgs
 
     private val curveID
-        get() = "${args.lasName}.${args.trackID}.curveList"
+        get() = "${args.lasName}.${args.trackID}"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -54,6 +55,7 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
     }
 
     private fun loadCurvesDataFromDB(){
+        Log.i("TEST", curveID.toString())
         curvesData = db.getCurveList(curveID) ?: readCurvesFromLas()
     }
 

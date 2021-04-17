@@ -31,6 +31,7 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
                 R.id.toolbar_graph_list, R.menu.menu_track_list, ::menuItemHandler)
 
         graphNames = db.getGraphNames()
+        db.clearTable(DatabaseHelper.TABLE_TEMP_TRACKS)
 
         graphNames.forEach{
             graphItems.add(RvEntryItem(it, ::actionHandler))
@@ -82,7 +83,7 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
             val position = indexOf(item)
             removeAt(position)
 
-            db.deleteTable(graphNames[position])
+            db.deleteLasGraph(graphNames[position])
             graphNames = db.getGraphNames()
 
             rv_graph_list.adapter?.apply {
@@ -93,6 +94,7 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
     }
 
     fun gotoGraph(item: RvEntryItem){
+        //TODO: Bug here when no track list has been saved yet!
         val tracksData = db.getTrackList(item.title)!!
 
         if(tracksData.size > 0) {
