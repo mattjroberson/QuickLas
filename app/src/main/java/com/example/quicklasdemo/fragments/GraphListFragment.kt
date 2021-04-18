@@ -28,7 +28,7 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
         db = DatabaseHelper(view.context)
 
         Toolbar(view, "Quick LAS", "Select Graph",
-                R.id.toolbar_graph_list, R.menu.menu_track_list, ::menuItemHandler)
+                R.id.toolbar_graph_list, R.menu.menu_graph_list, ::menuItemHandler)
 
         graphNames = db.getGraphNames()
         db.clearTable(DatabaseHelper.TABLE_TEMP_TRACKS)
@@ -51,7 +51,7 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
 
     private fun menuItemHandler(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.item_add_track -> openFile()
+            R.id.item_add_graph -> openFile()
         }
         return true
     }
@@ -93,11 +93,11 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
         }
     }
 
-    fun gotoGraph(item: RvEntryItem){
+    private fun gotoGraph(item: RvEntryItem){
         //TODO: Bug here when no track list has been saved yet!
-        val tracksData = db.getTrackList(item.title)!!
+        val tracksData = db.getTrackList(item.title)
 
-        if(tracksData.size > 0) {
+        if(tracksData != null && tracksData.size > 0){
             //val intent = Intent(activity, REPLACE_WITH_GRAPH_ACTIVITY::class.java)
             //intent.putExtra("lasName", args.lasName)
             //startActivity(intent)
@@ -112,7 +112,9 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
         view?.findNavController()?.navigate(directions)
     }
 
-    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), ::onResult)
+
+    private fun onResult(result: ActivityResult){
         if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.also { uri ->
 

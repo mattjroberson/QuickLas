@@ -3,6 +3,7 @@ package com.example.quicklasdemo.fragments
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,6 +40,11 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
         }
 
         connectRecyclerViewAdapter(view)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            this.isEnabled = true
+            navigateBackToGraphList()
+        }
     }
 
     private fun loadTracksDataFromDB(){

@@ -1,9 +1,9 @@
 package com.example.quicklasdemo.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,6 +43,11 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
         }
 
         connectRecyclerViewAdapter(view)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            this.isEnabled = true
+            navigateBackToTrackSettings()
+        }
     }
 
     private fun connectRecyclerViewAdapter(view : View){
@@ -55,7 +60,6 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
     }
 
     private fun loadCurvesDataFromDB(){
-        Log.i("TEST", curveID.toString())
         curvesData = db.getCurveList(curveID) ?: readCurvesFromLas()
     }
 
@@ -115,6 +119,7 @@ class CurveListFragment : Fragment(R.layout.fragment_curve_list) {
         val directions = CurveListFragmentDirections.actionCurveListFragmentToCurveSettingsFragment(
                 curveDataString,args.lasName,args.trackIndex,index,args.trackName,args.trackID)
 
+        db.addCurveList(curveID, curvesData)
         view?.findNavController()?.navigate(directions)
     }
 }
