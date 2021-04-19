@@ -1,5 +1,6 @@
 package com.example.quicklasdemo.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -7,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.quicklasdemo.*
+import com.example.quicklasdemo.activities.ChartActivity
 import com.example.quicklasdemo.data.Track
 import com.example.quicklasdemo.rv_items.RvTrackEntryItem
 import kotlinx.android.synthetic.main.fragment_track_list.*
@@ -121,9 +123,9 @@ class TrackListFragment : Fragment(R.layout.fragment_track_list) {
 
     private fun gotoGraph(){
         if(tracksData.size > 0) {
-            //val intent = Intent(activity, REPLACE_WITH_GRAPH_ACTIVITY::class.java)
-            //intent.putExtra("lasName", args.lasName)
-            //startActivity(intent)
+            val intent = Intent(activity, ChartActivity::class.java)
+            intent.putExtra("lasName", args.lasName)
+            startActivity(intent)
         }
         else{
             Utils.printMessage(view?.context,"Must have at least one track")
