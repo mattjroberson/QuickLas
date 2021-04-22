@@ -3,10 +3,6 @@ package com.example.quicklasdemo.activities;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.os.Bundle;
-import android.provider.CalendarContract;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 
 public class ChartActivity extends AppCompatActivity {
 
