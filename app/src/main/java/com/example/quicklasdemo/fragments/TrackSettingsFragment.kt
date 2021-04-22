@@ -3,6 +3,7 @@ package com.example.quicklasdemo.fragments
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,10 +24,8 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
     private lateinit var args: TrackSettingsFragmentArgs
 
     companion object {
-        private const val VERT_DIV_COUNT_MIN = 0
+        private const val VERT_DIV_COUNT_MIN = 1
         private const val VERT_DIV_COUNT_MAX = 10
-        private const val HOR_DIV_HEIGHT_MIN = 0
-        private const val HOR_DIV_HEIGHT_MAX = 10
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -50,8 +49,8 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
                     trackData.showGrid) { trackData.showGrid = it },
             RvNumberFieldItem("Vertical Divider Count",
                     trackData.verticalDivCount) { actionHandlerDivCount(it.toInt()) },
-            RvNumberFieldItem("Horizontal Divider Height (ft)",
-                    trackData.horizontalDivHeight) { actionHandlerDivHeight(it.toInt()) }
+            RvDropdownItem("Horizontal Divider Height", R.array.hor_div_height, getCurrHorizDivCount())
+                    { trackData.horizontalDivHeight = it.toInt()}
         )
 
         val trackSettingsAdapter = RvAdapter(trackList, view)
@@ -60,16 +59,21 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
             adapter = trackSettingsAdapter
             layoutManager = LinearLayoutManager(view.context)
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            this.isEnabled = true
+            navigateBackToTrackConfig()
+        }
     }
 
     private fun loadTrackDataFromDB() {
         tracksList = db.getTrackList(args.lasName) ?: mutableListOf()
 
-        if (args.trackIndex == -1) {
+        trackData = if (args.trackIndex == -1) {
             val trackID = "${args.lasName}.${args.trackID}"
-            trackData = db.getTempTrack(trackID) ?: Track(createNewTrackName())
+            db.getTempTrack(trackID) ?: Track(createNewTrackName())
         } else {
-            trackData = tracksList[args.trackIndex]
+            tracksList[args.trackIndex]
         }
     }
 
@@ -99,7 +103,7 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
         view?.findNavController()?.navigate(directions)
     }
 
-    private fun navigateBackToTrackConfig(track: Track?) {
+    private fun navigateBackToTrackConfig(track: Track? = null) {
         val trackDataString = if(track != null) Json.encodeToString(track) else null
 
         val directions = TrackSettingsFragmentDirections.actionTrackSettingsFragmentToTrackSetupFragment(
@@ -132,17 +136,7 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
             trackData.verticalDivCount = value
             return true
         }
-        Utils.printMessage(view?.context,"Value must be greater than $VERT_DIV_COUNT_MIN amd less than $VERT_DIV_COUNT_MAX")
-        return false
-    }
-
-    private fun actionHandlerDivHeight(value: Int):Boolean{
-        //Only accept values in true, return result back to item view
-        if(value in (HOR_DIV_HEIGHT_MIN + 1) until HOR_DIV_HEIGHT_MAX){
-            trackData.horizontalDivHeight = value
-            return true
-        }
-        Utils.printMessage(view?.context, "Value must be greater than $HOR_DIV_HEIGHT_MIN amd less than $HOR_DIV_HEIGHT_MAX")
+        Utils.printMessage(view?.context,"Value must be greater than $VERT_DIV_COUNT_MIN and less than $VERT_DIV_COUNT_MAX")
         return false
     }
 
@@ -156,5 +150,10 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
             }
         }
         return name
+    }
+
+    private fun getCurrHorizDivCount():Int {
+        val divArrays: Array<String> = resources.getStringArray(R.array.hor_div_height)
+        return divArrays.indexOf(trackData.horizontalDivHeight.toString())
     }
 }
