@@ -77,4 +77,7 @@ dependencies {
 
     //Needed for JSON serialization
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0'
+
+    // MPAndroidChart Integrations Automatically updates to latest version
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.+'
 }

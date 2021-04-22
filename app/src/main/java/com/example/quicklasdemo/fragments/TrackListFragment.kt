@@ -1,5 +1,6 @@
 package com.example.quicklasdemo.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.quicklasdemo.*
+import com.example.quicklasdemo.activities.ChartActivity
 import com.example.quicklasdemo.data.Track
 import com.example.quicklasdemo.rv_items.RvEntryItem
 import kotlinx.android.synthetic.main.fragment_track_list.*
