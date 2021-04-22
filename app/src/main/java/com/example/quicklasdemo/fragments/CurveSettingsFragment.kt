@@ -3,6 +3,7 @@ package com.example.quicklasdemo.fragments
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,6 +54,11 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
             adapter = trackSettingsAdapter
             layoutManager = LinearLayoutManager(view.context)
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            this.isEnabled = true
+            navigateBackToCurveConfig()
+        }
     }
 
     private fun menuItemHandler(item: MenuItem): Boolean {
@@ -83,7 +89,7 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
             }
         }
     }
-    //TODO: THERE IS A BUG IN GET CURR INDEX FOR DROPDOWN!!!
+
     private fun getCurrColorIndex(): Int {
         val colors = resources.getStringArray(R.array.colors)
 
