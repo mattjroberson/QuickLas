@@ -3,7 +3,6 @@ package com.example.quicklasdemo.activities;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -20,12 +19,9 @@ import com.github.mikephil.charting.interfaces.dataprovider.LineDataProvider;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
 
-import java.lang.reflect.Array;
-import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.json.*;
 
 public class ChartActivity extends AppCompatActivity {
 
@@ -41,11 +37,11 @@ public class ChartActivity extends AppCompatActivity {
         String lasName = getIntent().getStringExtra("lasName");
         Map<String, List<Float>> lasData = db.getLasData(lasName);
         List<Track> tracks = db.getTrackList(lasName);
-        System.out.println(lasName);
-        System.out.println(tracks);
-        System.out.println(tracks.get(0).component1());
-        System.out.println(lasData);
-       
+//        System.out.println(lasName);
+//        System.out.println(tracks);
+//        System.out.println(tracks.get(0).component1());
+//        System.out.println(lasData);
+//
 
 
         LasChart = (LineChart) findViewById(R.id.linechart);

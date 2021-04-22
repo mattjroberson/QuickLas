@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.result.ActivityResult
@@ -12,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.quicklasdemo.*
+import com.example.quicklasdemo.activities.ChartActivity
 import com.example.quicklasdemo.rv_items.RvEntryItem
 import kotlinx.android.synthetic.main.fragment_graph_list.*
 import java.io.BufferedReader
@@ -94,13 +96,12 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
     }
 
     private fun gotoGraph(item: RvEntryItem){
-        //TODO: Bug here when no track list has been saved yet!
         val tracksData = db.getTrackList(item.title)
 
         if(tracksData != null && tracksData.size > 0){
-            //val intent = Intent(activity, REPLACE_WITH_GRAPH_ACTIVITY::class.java)
-            //intent.putExtra("lasName", args.lasName)
-            //startActivity(intent)
+            val intent = Intent(activity, ChartActivity::class.java)
+            intent.putExtra("lasName", item.title)
+            startActivity(intent)
         }
         else{
             Utils.printMessage(view?.context,"Must have at least one track")

@@ -10,10 +10,8 @@ class TrackConfigActivity : AppCompatActivity(R.layout.activity_track_config){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val lasName = intent.getStringExtra("lasName")
 
         val bundle = bundleOf(
-                "lasName" to lasName,
                 "trackData" to null,
                 "trackIndex" to -1)
 

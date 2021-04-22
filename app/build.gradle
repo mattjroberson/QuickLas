@@ -38,6 +38,10 @@ android {
 //Needed for SafeArgs
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
