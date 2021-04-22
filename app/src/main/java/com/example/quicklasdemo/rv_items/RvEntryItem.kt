@@ -1,15 +1,14 @@
 package com.example.quicklasdemo.rv_items
 
 import android.view.View
-import com.example.quicklasdemo.data.Track
 import kotlinx.android.synthetic.main.item_track_entry.view.*
 
-class RvTrackEntryItem(
-        trackData: Track,
-        val actionHandler: (item: RvTrackEntryItem, type: ActionType) -> Unit) : RvItem(trackData.trackName) {
+class RvEntryItem(
+        trackName: String,
+        val actionHandler: (item: RvEntryItem, type: ActionType) -> Unit) : RvItem(trackName) {
 
     companion object {
-        enum class ActionType { EDIT, DELETE }
+        enum class ActionType { EDIT, DELETE, LABEL_ACTION }
     }
 
     override fun attach(itemView: View) {
@@ -18,15 +17,15 @@ class RvTrackEntryItem(
             track_name.apply {
                 text = title
                 setOnClickListener {
-                    actionHandler(this@RvTrackEntryItem, ActionType.EDIT)
+                    actionHandler(this@RvEntryItem, ActionType.LABEL_ACTION)
                 }
             }
 
             edit_track_button.setOnClickListener {
-                actionHandler(this@RvTrackEntryItem, ActionType.EDIT)
+                actionHandler(this@RvEntryItem, ActionType.EDIT)
             }
             delete_track_button.setOnClickListener {
-                actionHandler(this@RvTrackEntryItem, ActionType.DELETE)
+                actionHandler(this@RvEntryItem, ActionType.DELETE)
             }
         }
     }
