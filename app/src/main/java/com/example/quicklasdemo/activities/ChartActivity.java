@@ -3,6 +3,7 @@ package com.example.quicklasdemo.activities;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
