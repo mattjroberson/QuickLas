@@ -16,7 +16,6 @@ class RvAdapter(var rvItems: List<RvItem>, private var view: View) : RecyclerVie
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RvViewHolder {
         val layout = RvItemFactory.getItemLayout(viewType)
-
         val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
         return RvViewHolder(view)
     }

@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quicklasdemo.DatabaseHelper;
 import com.example.quicklasdemo.R;
+import com.example.quicklasdemo.data.Curve;
 import com.example.quicklasdemo.data.Track;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
@@ -31,6 +33,7 @@ import java.util.Map;
 public class ChartActivity extends AppCompatActivity {
 
     private static final String TAG = "ChartActivity";
+    private static final String[] DEPTH_NAMES =  {"DEPTH", "DEPT", "Depth", "Dept"};
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -147,15 +150,47 @@ public class ChartActivity extends AppCompatActivity {
             int verticalDivCount = tracks.get(0).component5();
             int horizontalDivHeight = tracks.get(0).component6();
 
+
             mCharts[t].getDescription().setEnabled(false);
             mCharts[t].setDrawGridBackground(showGrid);
 
             LineData data = new LineData(dataSets);
+            ConfigureChart(mCharts, data, curveIndex);
+        }
+    }
 
+    private void SetCurveStyle(LineDataSet data, String lineStyle) {
+        switch (lineStyle) {
+            case "Normal":
+                data.setLineWidth(1f);
+                break;
+            case "Dotted":
+                data.enableDashedLine(2f, 2f, 2f);
+                break;
+            case "Bold":
+                data.setLineWidth(2f);
+                break;
+        }
+    }
 
-            mCharts[t].setData(data);
+    private void SetCurveColor(LineDataSet data, String curveColor) {
+        switch (curveColor) {
+            case "FF0000":
+                data.setColor(Color.RED);
+                break;
+            case "0000FF":
+                data.setColor(Color.BLUE);
+                break;
+            case "00FF00":
+                data.setColor(Color.GREEN);
+                break;
+        }
+    }
 
-            mCharts[t].setViewPortOffsets(120f, 60f, 0f, 0f);
+    private void ConfigureChart(LineChart[] mCharts, LineData data, int currChart){
+       mCharts[t].setData(data);
+
+       mCharts[t].setViewPortOffsets(120f, 60f, 0f, 0f);
             mCharts[t].setDrawBorders(false);
             mCharts[t].getLegend().setDrawInside(false);
 
@@ -180,10 +215,20 @@ public class ChartActivity extends AppCompatActivity {
             mCharts[t].animateY(500);
             mCharts[t].notifyDataSetChanged();
             mCharts[t].invalidate();
+    }
 
+    // Initalizing Depth for Different LAS files
+    private String GetDepthName(Map<String, List<Float>> lasData){
+        for(String depthOption : DEPTH_NAMES){
+            if (lasData.containsKey(depthOption)) {
+                return depthOption;
+            }
         }
 
+        System.exit(-1);
+        return null;
     }
+}
 
 
     private float scaleCbr(double cbr) { //scales the values on x for linear
