@@ -1,12 +1,12 @@
 package com.example.quicklasdemo.activities;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quicklasdemo.DatabaseHelper;
@@ -16,15 +16,15 @@ import com.example.quicklasdemo.data.Track;
 import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.DataSet;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.listener.ChartTouchListener;
 import com.github.mikephil.charting.listener.OnChartGestureListener;
-import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
+import com.github.mikephil.charting.listener.OnDrawLineChartTouchListener;
+import com.github.mikephil.charting.listener.OnDrawListener;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,71 +44,118 @@ public class ChartActivity extends AppCompatActivity {
         Map<String, List<Float>> lasData = db.getLasData(lasName);
         List<Track> tracks = db.getTrackList(lasName);
 
-        int num_curves = tracks.get(0).component2().size();
-        LineChart[] mCharts = new LineChart[num_curves];
+        int num_tracks = tracks.size(); // Gets the Number of Tracks Inputed by User
+        int num_curves = tracks.get(0).component2().size(); // Gets the Number of Curves in each Track
 
-        if (num_curves == 1) {
-            setContentView(R.layout.line_chart);
-            mCharts[0] = (LineChart) findViewById(R.id.chart1);
-        } else if (num_curves == 2) {
-            setContentView(R.layout.double_chart);
-            mCharts[0] = (LineChart) findViewById(R.id.chart1);
-            mCharts[1] = (LineChart) findViewById(R.id.chart2);
-        } else if (num_curves == 3) {
-            setContentView(R.layout.triple_chart);
-            mCharts[0] = (LineChart) findViewById(R.id.chart1);
-            mCharts[1] = (LineChart) findViewById(R.id.chart2);
-            mCharts[2] = (LineChart) findViewById(R.id.chart3);
+        LineChart[] mCharts = new LineChart[num_tracks]; // Sets the number of Charts
+
+        switch(num_tracks) { // Takes Number of Tracks and Sets the Layout File *Resources are Compile Time Functions*
+            case 1:
+                setContentView(R.layout.line_chart);
+                mCharts[0] = (LineChart) findViewById(R.id.chart1);
+                break;
+            case 2:
+                setContentView(R.layout.double_chart);
+                mCharts[0] = (LineChart) findViewById(R.id.chart1);
+                mCharts[1] = (LineChart) findViewById(R.id.chart2);
+                break;
+            case 3:
+                setContentView(R.layout.triple_chart);
+                mCharts[0] = (LineChart) findViewById(R.id.chart1);
+                mCharts[1] = (LineChart) findViewById(R.id.chart2);
+                mCharts[2] = (LineChart) findViewById(R.id.chart3);
+                break; }
+
+        String Depth; // Seeks Curve Title for Depth for Y Value
+        if (lasData.containsKey("DEPT")) {
+            Depth = "DEPT";
+        } else {
+            Depth = "DEPTH";
         }
 
-        String Depth = GetDepthName(lasData);
 
-        //Track Properties
-        Track track = tracks.get(0);
+        for (int t = 0; t < num_tracks; t++) { // variable t = tracks in for loop
 
-        Boolean showGrid = track.component3();
-        Boolean isLinear = track.component4();
-        int verticalDivCount = track.component5();
-        int horizontalDivHeight = track.component6();
+            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
 
-        //Curve Properties
-        List<Curve> curveList = track.component2();
-        List<Float> depth = lasData.get(Depth);
-        Log.i("TEST", String.valueOf(depth.size()));
+            for (int c = 0; c < num_curves; c++) { // variable c = curves in for loop
 
-        for (int curveIndex = 0; curveIndex < curveList.size(); curveIndex++) {
-            ArrayList<Entry> points = new ArrayList<>();
-            Curve curve = curveList.get(curveIndex);
 
-            String curveName = curve.component1();
-            List<Float> curvePoints = lasData.get(curveName);
+                ArrayList<Entry> yVals = new ArrayList<>();
 
-            for (int x = 0; x < curvePoints.size(); x++) {
-                Entry point = new Entry(curvePoints.get(x),
-                        depth.get(x));
-                points.add(point);
+
+                int curve_size = lasData.get(tracks.get(t).component2().get(c).component1()).size();
+
+                for (int x = 0; x < curve_size; x++) { // variable x = number of values for each curve
+
+                    Float x_val = lasData.get(tracks.get(t).component2().get(c).component1()).get(x); // value from curve (x-axis)
+                    Float y_val = lasData.get(Depth).get(x); // value from depth (y-axis)
+                    Boolean isLinear = tracks.get(t).component4();
+
+                    if (x_val == -999.2500) {
+                        System.out.println("invalid");
+                    } else if (isLinear) {
+                        yVals.add(new Entry(scaleCbr(x_val), y_val)); // (Entry log(x), y)
+                    } else {
+                        yVals.add(new Entry(x_val, y_val)); // (Entry x, y)
+                    }
+                }
+
+
+                String curve_name = tracks.get(t).component2().get(c).component1(); // Name of the Curve pulled from Las Data
+
+                String lineStyle = tracks.get(t).component2().get(c).component2(); // user selected Line Style from settings
+                String curveColor = tracks.get(t).component2().get(c).component3(); // user selected Curve Color from settings
+                float scaleMin = tracks.get(t).component2().get(c).component4(); // user selected Scale Min from settings
+                float scaleMax = tracks.get(t).component2().get(c).component5(); // user selected Line Style from settings
+
+
+                LineDataSet set1 = new LineDataSet(yVals, curve_name);
+
+                switch (lineStyle) { // Setting Line Style
+                    case "Normal":
+                        set1.setLineWidth(1f);
+                        break;
+                    case "Dotted":
+                        set1.enableDashedLine(2f, 2f, 2f);
+                        break;
+                    case "Bold":
+                        set1.setLineWidth(2f);
+                        break;
+                }
+
+                switch (curveColor) { // Setting Curve Color
+                    case "FF0000":
+                        set1.setColor(Color.RED);
+                        break;
+                    case "0000FF":
+                        set1.setColor(Color.BLUE);
+                        break;
+                    case "00FF00":
+                        set1.setColor(Color.GREEN);
+                        break;
+                }
+
+                set1.setDrawValues(true);
+                set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+                set1.setCubicIntensity(0.2f);
+
+                dataSets.add(set1);
+
             }
 
-            //float num_values = lasData.get(tracks.get(0).component2().get(i).component1()).size();
 
-            String lineStyle = curve.component2();
-            String curveColor = curve.component3();
-            float scaleMin = curve.component4();
-            float scaleMax = curve.component5();
+            Boolean showGrid = tracks.get(0).component3();
+            Boolean isLinear = tracks.get(0).component4();
+            int verticalDivCount = tracks.get(0).component5();
+            int horizontalDivHeight = tracks.get(0).component6();
 
-            LineDataSet set1 = new LineDataSet(points, curveName);
-            SetCurveStyle(set1, lineStyle);
-            SetCurveColor(set1, curveColor);
 
-            set1.setDrawValues(true);
-            set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-            set1.setCubicIntensity(0.2f);
+            mCharts[t].getDescription().setEnabled(false);
+            mCharts[t].setDrawGridBackground(showGrid);
 
-            LineData data = new LineData(set1);
-
+            LineData data = new LineData(dataSets);
             ConfigureChart(mCharts, data, curveIndex);
-
-
         }
     }
 
@@ -141,23 +188,33 @@ public class ChartActivity extends AppCompatActivity {
     }
 
     private void ConfigureChart(LineChart[] mCharts, LineData data, int currChart){
-        mCharts[currChart].getDescription().setEnabled(false);
-        //mCharts[currChart].setDrawGridBackground(showGrid);
+       mCharts[t].setData(data);
 
-        mCharts[currChart].setData(data);
+       mCharts[t].setViewPortOffsets(120f, 60f, 0f, 0f);
+            mCharts[t].setDrawBorders(false);
+            mCharts[t].getLegend().setDrawInside(false);
 
-        mCharts[currChart].setViewPortOffsets(120f, 60f, 0f, 0f);
-        //mCharts[currChart].getXAxis().setAxisMinimum(-5f);
-        //mCharts[currChart].getXAxis().setAxisMaximum(105f);
-        mCharts[currChart].getAxisRight().setAxisMinimum(0f);
-        mCharts[currChart].getAxisRight().setAxisMaximum(100f);
-        mCharts[currChart].setBackgroundColor(Color.DKGRAY);
-        mCharts[currChart].getAxisLeft().setTextColor(Color.WHITE);
-        mCharts[currChart].getXAxis().setTextColor(Color.WHITE);
-        mCharts[currChart].getLegend().setTextColor(Color.WHITE);
-        mCharts[currChart].getDescription().setTextColor(Color.WHITE);
-        mCharts[currChart].setDrawGridBackground(false);
-        mCharts[currChart].invalidate();
+            //Setting Axis to log Value
+            if (isLinear) {
+                mCharts[t].getAxisRight().setAxisMinimum(scaleCbr(0.001));
+                mCharts[t].getAxisRight().setAxisMaximum(scaleCbr(100.0));
+                mCharts[t].getAxisRight().setLabelCount(10, true); }
+
+
+            mCharts[t].setAutoScaleMinMaxEnabled(true); // Autosize Chart on load to fit line
+
+
+            mCharts[t].setBackgroundColor(Color.DKGRAY);
+            mCharts[t].getAxisLeft().setTextColor(Color.WHITE);
+            mCharts[t].getXAxis().setTextColor(Color.WHITE);
+            mCharts[t].getLegend().setTextColor(Color.WHITE);
+            mCharts[t].getDescription().setTextColor(Color.WHITE);
+            mCharts[t].setDrawGridBackground(false); // Makes Graph Background Transparent to show Layout Background Color
+            mCharts[t].setVisibleXRangeMaximum(500);
+            mCharts[t].fitScreen();
+            mCharts[t].animateY(500);
+            mCharts[t].notifyDataSetChanged();
+            mCharts[t].invalidate();
     }
 
     // Initalizing Depth for Different LAS files
@@ -171,6 +228,20 @@ public class ChartActivity extends AppCompatActivity {
         System.exit(-1);
         return null;
     }
+}
+
+
+    private float scaleCbr(double cbr) { //scales the values on x for linear
+        return (float)(Math.log10(cbr));
+    }
+
+    private float unScaleCbr(double cbr) { //unscales the labels for x axis to show linear
+        double calcVal = Math.pow(10, cbr);
+        return (float)(calcVal);
+    }
+
+
+
 }
 
 
