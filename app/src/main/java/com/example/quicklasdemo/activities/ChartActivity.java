@@ -1,20 +1,27 @@
 package com.example.quicklasdemo.activities;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quicklasdemo.DatabaseHelper;
 import com.example.quicklasdemo.R;
 import com.example.quicklasdemo.data.Track;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-
+import com.github.mikephil.charting.listener.ChartTouchListener;
+import com.github.mikephil.charting.listener.OnChartGestureListener;
+import com.github.mikephil.charting.listener.OnDrawLineChartTouchListener;
+import com.github.mikephil.charting.listener.OnDrawListener;
 
 
 import java.util.ArrayList;
@@ -33,7 +40,6 @@ public class ChartActivity extends AppCompatActivity {
         String lasName = getIntent().getStringExtra("lasName");
         Map<String, List<Float>> lasData = db.getLasData(lasName);
         List<Track> tracks = db.getTrackList(lasName);
-
 
         int num_tracks = tracks.size(); // Gets the Number of Tracks Inputed by User
         int num_curves = tracks.get(0).component2().size(); // Gets the Number of Curves in each Track
@@ -130,6 +136,7 @@ public class ChartActivity extends AppCompatActivity {
                 set1.setDrawValues(true);
                 set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
                 set1.setCubicIntensity(0.2f);
+
                 dataSets.add(set1);
 
             }
@@ -156,10 +163,11 @@ public class ChartActivity extends AppCompatActivity {
             if (isLinear) {
                 mCharts[t].getAxisRight().setAxisMinimum(scaleCbr(0.001));
                 mCharts[t].getAxisRight().setAxisMaximum(scaleCbr(100.0));
-                mCharts[t].getAxisRight().setLabelCount(6, true); }
+                mCharts[t].getAxisRight().setLabelCount(10, true); }
 
 
             mCharts[t].setAutoScaleMinMaxEnabled(true); // Autosize Chart on load to fit line
+
 
             mCharts[t].setBackgroundColor(Color.DKGRAY);
             mCharts[t].getAxisLeft().setTextColor(Color.WHITE);
@@ -167,9 +175,14 @@ public class ChartActivity extends AppCompatActivity {
             mCharts[t].getLegend().setTextColor(Color.WHITE);
             mCharts[t].getDescription().setTextColor(Color.WHITE);
             mCharts[t].setDrawGridBackground(false); // Makes Graph Background Transparent to show Layout Background Color
+            mCharts[t].setVisibleXRangeMaximum(500);
+            mCharts[t].fitScreen();
+            mCharts[t].animateY(500);
+            mCharts[t].notifyDataSetChanged();
             mCharts[t].invalidate();
 
         }
+
     }
 
 
@@ -181,6 +194,9 @@ public class ChartActivity extends AppCompatActivity {
         double calcVal = Math.pow(10, cbr);
         return (float)(calcVal);
     }
+
+
+
 }
 
 
