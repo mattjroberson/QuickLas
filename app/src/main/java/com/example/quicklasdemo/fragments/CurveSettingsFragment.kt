@@ -123,10 +123,10 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
 //            Utils.printMessage(view?.context, "Max Scale must be less than $SCALE_MAX")
 //            return false
 //        }
-        if (value <= curveData.scaleMin) {
-            Utils.printMessage(view?.context, "Max Scale must be greater than Min Scale")
-            return false
-        }
+//        if (value <= curveData.scaleMin) {
+//            Utils.printMessage(view?.context, "Max Scale must be greater than Min Scale")
+//            return false
+//        }
         curveData.scaleMax = value
         return true
     }

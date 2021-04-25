@@ -147,8 +147,8 @@ public class ChartActivity extends AppCompatActivity {
         mCharts[currChart].setData(data);
 
         mCharts[currChart].setViewPortOffsets(120f, 60f, 0f, 0f);
-        mCharts[currChart].getXAxis().setAxisMinimum(-5f);
-        mCharts[currChart].getXAxis().setAxisMaximum(105f);
+        //mCharts[currChart].getXAxis().setAxisMinimum(-5f);
+        //mCharts[currChart].getXAxis().setAxisMaximum(105f);
         mCharts[currChart].getAxisRight().setAxisMinimum(0f);
         mCharts[currChart].getAxisRight().setAxisMaximum(100f);
         mCharts[currChart].setBackgroundColor(Color.DKGRAY);

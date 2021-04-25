@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:background">?colorPrimary</item>
+        <item name="android:textColorPrimary">?colorOnPrimary</item>
+        <item name="android:textColorSecondary">?colorOnPrimary</item>
+        <item name="android:subtitleTextColor">@color/white</item>
+    </style>
+
+</resources>
