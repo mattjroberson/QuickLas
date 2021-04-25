@@ -5,7 +5,9 @@
         <item name="colorPrimary">@color/app_gray</item>
         <item name="colorPrimaryVariant">@color/app_gray_dark</item>
         <item name="colorOnPrimary">@color/app_yellow</item>
-\        <!-- Secondary brand color. -->
+        <item name="colorOnBackground">@color/app_gray</item>
+        <item name="colorAccent">@color/app_gray</item>
+        <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/app_yellow</item>
         <item name="colorSecondaryVariant">@color/app_yellow_dark</item>
         <item name="colorOnSecondary">@color/black</item>

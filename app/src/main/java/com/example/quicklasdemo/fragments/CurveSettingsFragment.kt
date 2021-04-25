@@ -12,7 +12,9 @@ import com.example.quicklasdemo.RvAdapter
 import com.example.quicklasdemo.Toolbar
 import com.example.quicklasdemo.Utils
 import com.example.quicklasdemo.data.Curve
-import com.example.quicklasdemo.rv_items.*
+import com.example.quicklasdemo.rv_items.RvDropdownItem
+import com.example.quicklasdemo.rv_items.RvItem
+import com.example.quicklasdemo.rv_items.RvNumberFieldItem
 import kotlinx.android.synthetic.main.fragment_curve_settings.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -106,10 +108,10 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
     }
 
     private fun actionHandlerScaleMin(value: Float): Boolean {
-        if (value < SCALE_MIN) {
-            Utils.printMessage(view?.context, "Min Scale must be greater than $SCALE_MIN")
-            return false
-        }
+//        if (value < SCALE_MIN) {
+//            Utils.printMessage(view?.context, "Min Scale must be greater than $SCALE_MIN")
+//            return false
+//        }
         if (value >= curveData.scaleMax) {
             Utils.printMessage(view?.context, "Min Scale must be less than Max Scale")
             return false
@@ -123,10 +125,10 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
 //            Utils.printMessage(view?.context, "Max Scale must be less than $SCALE_MAX")
 //            return false
 //        }
-//        if (value <= curveData.scaleMin) {
-//            Utils.printMessage(view?.context, "Max Scale must be greater than Min Scale")
-//            return false
-//        }
+        if (value <= curveData.scaleMin) {
+            Utils.printMessage(view?.context, "Max Scale must be greater than Min Scale")
+            return false
+        }
         curveData.scaleMax = value
         return true
     }

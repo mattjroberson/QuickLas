@@ -4,9 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.addCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -14,6 +14,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.quicklasdemo.*
 import com.example.quicklasdemo.activities.ChartActivity
+import com.example.quicklasdemo.activities.MainActivity
 import com.example.quicklasdemo.rv_items.RvEntryItem
 import kotlinx.android.synthetic.main.fragment_graph_list.*
 import java.io.BufferedReader
@@ -40,6 +41,11 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
         }
 
         connectRecyclerViewAdapter(view)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this) {
+            this.isEnabled = true
+            navigateBackToLogoScreen()
+        }
     }
 
         private fun connectRecyclerViewAdapter(view: View){
@@ -111,6 +117,11 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
     private fun navigateIntoTrackList(index: Int) {
         val directions = GraphListFragmentDirections.actionGraphListFragmentToTrackSetupFragment(graphNames[index], null, -1)
         view?.findNavController()?.navigate(directions)
+    }
+
+    private fun navigateBackToLogoScreen(){
+        val intent = Intent(activity, MainActivity::class.java)
+        startActivity(intent)
     }
 
     private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), ::onResult)

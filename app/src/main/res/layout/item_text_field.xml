@@ -3,6 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="50dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp"
     android:background="@drawable/bg_item">
 
     <EditText
@@ -10,10 +12,10 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
 
-        android:text="setting"
-        android:textSize="20sp"
-        android:maxLines="1"
         android:inputType="text"
+        android:maxLines="1"
+        android:text="setting"
+        android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
