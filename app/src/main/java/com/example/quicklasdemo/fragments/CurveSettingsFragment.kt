@@ -30,10 +30,6 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
             arrayOf("Blue", "0000FF")
     )
 
-    companion object {
-        const val SCALE_MIN = 0
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         args = CurveSettingsFragmentArgs.fromBundle(requireArguments())
@@ -108,10 +104,6 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
     }
 
     private fun actionHandlerScaleMin(value: Float): Boolean {
-//        if (value < SCALE_MIN) {
-//            Utils.printMessage(view?.context, "Min Scale must be greater than $SCALE_MIN")
-//            return false
-//        }
         if (value >= curveData.scaleMax) {
             Utils.printMessage(view?.context, "Min Scale must be less than Max Scale")
             return false
@@ -121,10 +113,6 @@ class CurveSettingsFragment : Fragment(R.layout.fragment_curve_settings) {
     }
 
     private fun actionHandlerScaleMax(value: Float): Boolean {
-//        if (value > SCALE_MAX) {
-//            Utils.printMessage(view?.context, "Max Scale must be less than $SCALE_MAX")
-//            return false
-//        }
         if (value <= curveData.scaleMin) {
             Utils.printMessage(view?.context, "Max Scale must be greater than Min Scale")
             return false
