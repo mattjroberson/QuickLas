@@ -3,6 +3,7 @@ package com.example.quicklasdemo.activities;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -92,17 +93,23 @@ public class ChartActivity extends AppCompatActivity {
                 float scaleMin = curve.getScaleMin(); // user selected Scale Min from settings
                 float scaleMax = curve.getScaleMax(); // user selected Line Style from settings
 
+                if(!isLinear){
+                    scaleMax = scaleCbr(scaleMax);
+                    scaleMin = scaleCbr(scaleMin);
+                }
+
                 for (int x = 0; x < curve_data.size(); x+=5) { // variable x = number of values for each curve
 
                     float x_val = curve_data.get(x); // value from curve (x-axis)
                     float y_val = depth_data.get(x); // value from depth (y-axis)
 
                     if (x_val != -999.2500) {
-                        x_val = (x_val - scaleMin) / (scaleMax-scaleMin);
+                        if (!isLinear){
+                            x_val = scaleCbr(x_val);
+                        }
 
-                        Entry point = new Entry(y_val, x_val);
-                        //if (!isLinear) point.setX(scaleCbr(x_val));
-                        points.add(point);
+                        x_val = (x_val - scaleMin) / (scaleMax-scaleMin);
+                        points.add(new Entry(y_val, x_val));
                     }
                 }
 
@@ -110,7 +117,6 @@ public class ChartActivity extends AppCompatActivity {
 
                 String lineStyle = curve.getLineStyle(); // user selected Line Style from settings
                 String curveColor = curve.getCurveColor(); // user selected Curve Color from settings
-
 
                 LineDataSet set1 = new LineDataSet(points, curve_name);
 
@@ -120,15 +126,16 @@ public class ChartActivity extends AppCompatActivity {
                 set1.setDrawCircles(false);
                 set1.setDrawHighlightIndicators(false);
                 set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-                //set1.setCubicIntensity(0.2f);
 
                 dataSets.add(set1);
             }
 
             LineData data = new LineData(dataSets);
-            ConfigureChart(mCharts, data, trackIndex, isLinear);
+            ConfigureChart(mCharts, data, trackIndex, showGrid, verticalDivCount);
 
         }
+
+        mCharts[0].getXAxis().setDrawLabels(true);
     }
 
     private void SetCurveStyle(LineDataSet data, String lineStyle) {
@@ -159,10 +166,13 @@ public class ChartActivity extends AppCompatActivity {
         }
     }
 
-    private void ConfigureChart(LineChart[] mCharts, LineData data, int currChart, boolean isLinear) {
+    private void ConfigureChart(LineChart[] mCharts, LineData data, int currChart, boolean showGrid, int vertDivCount) {
         mCharts[currChart].getAxisLeft().setAxisMinimum(0);
         mCharts[currChart].getAxisLeft().setAxisMaximum(1);
+        mCharts[currChart].getAxisLeft().setLabelCount(vertDivCount);
+        //mCharts[currChart].getAxisLeft().setDrawLabels(false);
         mCharts[currChart].getAxisRight().setEnabled(false);
+        mCharts[currChart].getXAxis().setDrawLabels(false);
 
         mCharts[currChart].setData(data);
 
@@ -171,12 +181,17 @@ public class ChartActivity extends AppCompatActivity {
         mCharts[currChart].setDrawGridBackground(false);
         mCharts[currChart].setDrawBorders(false);
         mCharts[currChart].setScaleEnabled(false);
-        mCharts[currChart].getLegend().setDrawInside(false);
+        mCharts[currChart].getLegend().setEnabled(false);
+
+        //Show grid settings option
+        mCharts[currChart].getAxisLeft().setDrawGridLines(showGrid);
+        mCharts[currChart].getXAxis().setDrawGridLines(showGrid);
+        Log.i("TEST", String.valueOf(showGrid));
+
 
         mCharts[currChart].setBackgroundColor(Color.DKGRAY);
         mCharts[currChart].getAxisLeft().setTextColor(Color.WHITE);
         //mCharts[currChart].getXAxis().setTextColor(Color.WHITE);
-        //mCharts[currChart].getLegend().setTextColor(Color.WHITE);
 
         mCharts[currChart].animateX(500);
 
@@ -196,8 +211,8 @@ public class ChartActivity extends AppCompatActivity {
         return null;
     }
 
-    private float scaleCbr(double cbr) { //scales the values on x for linear
-        return (float) (Math.log10(cbr));
+    private float scaleCbr(float cbr) { //scales the values on x for linear
+        return (float) Math.log10(cbr);
     }
 }
 
