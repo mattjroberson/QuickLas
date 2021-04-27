@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.quicklasdemo.CoupleChartGestureListener;
 import com.example.quicklasdemo.DatabaseHelper;
+import com.example.quicklasdemo.Label;
 import com.example.quicklasdemo.R;
 import com.example.quicklasdemo.data.Curve;
 import com.example.quicklasdemo.data.Track;
@@ -50,15 +51,20 @@ public class ChartActivity extends AppCompatActivity {
 
         switch (num_tracks) { // Takes Number of Tracks and Sets the Layout File *Resources are Compile Time Functions*
             case 1:
-                setContentView(R.layout.line_chart);
+                setContentView(R.layout.chart_single);
                 mCharts[0] = findViewById(R.id.chart1);
+                Label labelHolder = new Label(
+                        findViewById(R.id.curve_label_1_min),
+                        findViewById(R.id.curve_label_1),
+                        findViewById(R.id.curve_label_1_max));
                 break;
             case 2:
-                setContentView(R.layout.double_chart);
+                setContentView(R.layout.chart_double);
                 mCharts[0] = findViewById(R.id.chart1);
                 mCharts[1] = findViewById(R.id.chart2);
                 break;
         }
+
 
         String depth_name = GetDepthName(lasData);
         List<Float> depth_data = lasData.get(depth_name);
