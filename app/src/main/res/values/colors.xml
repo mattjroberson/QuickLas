@@ -9,4 +9,6 @@
     <color name="app_yellow">#ffeb3b</color>
     <color name="app_yellow_dark">#c8b900</color>
 
+    <color name="light_gray">#D3D3D3</color>
+
 </resources>

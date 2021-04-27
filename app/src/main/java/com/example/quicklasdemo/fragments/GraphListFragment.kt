@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.quicklasdemo.*
 import com.example.quicklasdemo.activities.ChartActivity
 import com.example.quicklasdemo.activities.MainActivity
+import com.example.quicklasdemo.data.Track
 import com.example.quicklasdemo.rv_items.RvEntryItem
 import kotlinx.android.synthetic.main.fragment_graph_list.*
 import java.io.BufferedReader
@@ -26,12 +27,18 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
     private var graphNames = mutableListOf<String>()
     private lateinit var db: DatabaseHelper
 
+    companion object{
+        private const val MAX_TRACKS = 2
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         db = DatabaseHelper(view.context)
 
-        Toolbar(view, "Quick LAS", "Select Graph",
-                R.id.toolbar_graph_list, R.menu.menu_graph_list, ::menuItemHandler)
+        Toolbar(
+            view, "Quick LAS", "Select LAS File",
+            R.id.toolbar_graph_list, R.menu.menu_graph_list, ::menuItemHandler
+        )
 
         graphNames = db.getGraphNames()
         db.clearTable(DatabaseHelper.TABLE_TEMP_TRACKS)
@@ -105,17 +112,30 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
         val tracksData = db.getTrackList(item.title)
 
         if(tracksData != null && tracksData.size > 0){
+            if(tracksData.size > MAX_TRACKS){
+                Utils.printMessage(view?.context, "Currently only supports $MAX_TRACKS tracks")
+                return
+            }
+            if(checkForEmpty(tracksData)){
+                Utils.printMessage(view?.context, "None of the current tracks have curves selected!")
+                return
+            }
+
             val intent = Intent(activity, ChartActivity::class.java)
             intent.putExtra("lasName", item.title)
             startActivity(intent)
         }
         else{
-            Utils.printMessage(view?.context,"Must have at least one track")
+            Utils.printMessage(view?.context, "Must have at least one track")
         }
     }
 
     private fun navigateIntoTrackList(index: Int) {
-        val directions = GraphListFragmentDirections.actionGraphListFragmentToTrackSetupFragment(graphNames[index], null, -1)
+        val directions = GraphListFragmentDirections.actionGraphListFragmentToTrackSetupFragment(
+            graphNames[index],
+            null,
+            -1
+        )
         view?.findNavController()?.navigate(directions)
     }
 
@@ -124,7 +144,10 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
         startActivity(intent)
     }
 
-    private val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), ::onResult)
+    private val startForResult = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        ::onResult
+    )
 
     private fun onResult(result: ActivityResult){
         if (result.resultCode == Activity.RESULT_OK) {
@@ -172,5 +195,18 @@ class GraphListFragment : Fragment(R.layout.fragment_graph_list) {
             }
         }
         return stringList
+    }
+
+    //Returns true if the provided tracks dont have any data to graph
+    private fun checkForEmpty(tracks: List<Track>): Boolean {
+        var isEmpty = true
+
+        for ((_, curveList) in tracks) {
+            if (curveList.size > 0) {
+                isEmpty = false
+                break
+            }
+        }
+        return isEmpty
     }
 }

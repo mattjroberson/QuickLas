@@ -6,8 +6,7 @@ import kotlinx.serialization.Serializable
 data class Track (
         var trackName: String = "Default Name",
         var curveList: MutableList<Curve> = mutableListOf(),
-        var showGrid: Boolean = false,
+        var showGrid: Boolean = true,
         var isLinear: Boolean = true,
-        var verticalDivCount: Int = 3,
-        var horizontalDivHeight: Int = 5,
+        var verticalDivCount: Int = 4,
         var uniqueID: Long = System.currentTimeMillis())

@@ -12,6 +12,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TRACK NAME"
+        android:textStyle="bold"
+        android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,10 +22,11 @@
     <!--LABEL 1 MIN-->
     <TextView
         android:id="@+id/curve_label_1_min"
-        android:layout_width="40dp"
+        android:layout_width="45dp"
         android:layout_height="wrap_content"
+        android:maxLines="1"
         android:rotation="-90"
-        android:text="-1000"
+        android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@id/curve_label_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,32 +41,33 @@
         app:layout_constraintBottom_toTopOf="@id/curve_label_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/track_name"
-        android:text="Curve 1"/>
+        app:layout_constraintTop_toBottomOf="@id/track_name"/>
 
     <!--LABEL 1 MAX-->
     <TextView
         android:id="@+id/curve_label_1_max"
-        android:layout_width="40dp"
+        android:layout_width="45dp"
         android:layout_height="wrap_content"
+        android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@id/curve_label_2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/track_name"
-        android:text="-1000"
+        android:textAlignment="center"
         android:rotation="-90"
         app:layout_constraintHorizontal_bias="0.95"/>
 
     <!--LABEL 2 Min-->
     <TextView
         android:id="@+id/curve_label_2_min"
-        android:layout_width="40dp"
+        android:layout_width="45dp"
         android:layout_height="wrap_content"
+        android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@id/curve_label_3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/curve_label_1"
-        android:text="-1000"
+        android:textAlignment="center"
         android:rotation="-90"
         app:layout_constraintHorizontal_bias="0.05"
         />
@@ -76,32 +80,33 @@
         app:layout_constraintBottom_toTopOf="@id/curve_label_3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/curve_label_1"
-        android:text="Curve 2"/>
+        app:layout_constraintTop_toBottomOf="@id/curve_label_1"/>
 
     <!--LABEL 2 MAX-->
     <TextView
         android:id="@+id/curve_label_2_max"
-        android:layout_width="40dp"
+        android:layout_width="45dp"
         android:layout_height="wrap_content"
+        android:maxLines="1"
         app:layout_constraintBottom_toTopOf="@id/curve_label_3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/curve_label_1"
-        android:text="-1000"
+        android:textAlignment="center"
         android:rotation="-90"
         app:layout_constraintHorizontal_bias="0.95"/>
 
     <!--LABEL 3 Min-->
     <TextView
         android:id="@+id/curve_label_3_min"
-        android:layout_width="40dp"
+        android:layout_width="45dp"
         android:layout_height="wrap_content"
+        android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/curve_label_2"
-        android:text="-1000"
+        android:textAlignment="center"
         android:rotation="-90"
         app:layout_constraintHorizontal_bias="0.05"
         />
@@ -114,19 +119,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/curve_label_2"
-        android:text="Curve 3"/>
+        app:layout_constraintTop_toBottomOf="@id/curve_label_2"/>
 
     <!--LABEL 3 MAX-->
     <TextView
         android:id="@+id/curve_label_3_max"
-        android:layout_width="40dp"
+        android:layout_width="45dp"
         android:layout_height="wrap_content"
+        android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/curve_label_2"
-        android:text="-1000"
+        android:textAlignment="center"
         android:rotation="-90"
         app:layout_constraintHorizontal_bias="0.95"/>
 

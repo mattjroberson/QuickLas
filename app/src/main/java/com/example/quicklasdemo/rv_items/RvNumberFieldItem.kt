@@ -18,7 +18,7 @@ class RvNumberFieldItem(
             setText(value.toString());
 
             setOnEditorActionListener{ _, actionId, _ ->
-                if(actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE){
+                if(actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_GO){
                     val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(windowToken, 0)
 

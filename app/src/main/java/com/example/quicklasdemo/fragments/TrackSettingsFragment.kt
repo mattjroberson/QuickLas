@@ -10,7 +10,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.quicklasdemo.*
 import com.example.quicklasdemo.data.Curve
 import com.example.quicklasdemo.data.Track
-import com.example.quicklasdemo.rv_items.*
+import com.example.quicklasdemo.rv_items.RvBooleanItem
+import com.example.quicklasdemo.rv_items.RvClickableItem
+import com.example.quicklasdemo.rv_items.RvNumberFieldItem
+import com.example.quicklasdemo.rv_items.RvTextFieldItem
 import kotlinx.android.synthetic.main.fragment_track_settings.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -48,9 +51,7 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
             RvBooleanItem("Show Grid",
                     trackData.showGrid) { trackData.showGrid = it },
             RvNumberFieldItem("Vertical Divider Count",
-                    trackData.verticalDivCount) { actionHandlerDivCount(it.toInt()) },
-            RvDropdownItem("Horizontal Divider Height", R.array.hor_div_height, getCurrHorizDivCount())
-                    { trackData.horizontalDivHeight = it.toInt()}
+                    trackData.verticalDivCount) { actionHandlerDivCount(it.toInt()) }
         )
 
         val trackSettingsAdapter = RvAdapter(trackList, view)
@@ -141,19 +142,14 @@ class TrackSettingsFragment : Fragment(R.layout.fragment_track_settings) {
     }
 
     //Recursive function to ensure new track names are unique (New Track, New Track 1, New Track 2...)
-    private fun createNewTrackName(index: Int = 0): String{
-        val name = if(index == 0) "New Track" else "New Track $index"
+    private fun createNewTrackName(index: Int = 0): String {
+        val name = if (index == 0) "Track 1" else "Track $index"
 
         tracksList.forEach {
-            if(it.trackName == name){
-                return createNewTrackName(index+1)
+            if (it.trackName == name) {
+                return createNewTrackName(index + 1)
             }
         }
         return name
-    }
-
-    private fun getCurrHorizDivCount():Int {
-        val divArrays: Array<String> = resources.getStringArray(R.array.hor_div_height)
-        return divArrays.indexOf(trackData.horizontalDivHeight.toString())
     }
 }
