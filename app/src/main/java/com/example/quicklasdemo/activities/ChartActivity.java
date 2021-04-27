@@ -8,17 +8,18 @@ import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.quicklasdemo.CoupleChartGestureListener;
 import com.example.quicklasdemo.DatabaseHelper;
 import com.example.quicklasdemo.R;
 import com.example.quicklasdemo.data.Curve;
 import com.example.quicklasdemo.data.Track;
+import com.github.mikephil.charting.charts.Chart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.EntryXComparator;
-
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,25 +50,25 @@ public class ChartActivity extends AppCompatActivity {
 
         switch (num_tracks) { // Takes Number of Tracks and Sets the Layout File *Resources are Compile Time Functions*
             case 1:
-                //mCharts[0] = new LineChart(this);
                 setContentView(R.layout.line_chart);
-                mCharts[0] = (LineChart) findViewById(R.id.chart1);
+                mCharts[0] = findViewById(R.id.chart1);
                 break;
             case 2:
                 setContentView(R.layout.double_chart);
-                mCharts[0] = (LineChart) findViewById(R.id.chart1);
-                mCharts[1] = (LineChart) findViewById(R.id.chart2);
-                break;
-            case 3:
-                setContentView(R.layout.triple_chart);
-                mCharts[0] = (LineChart) findViewById(R.id.chart1);
-                mCharts[1] = (LineChart) findViewById(R.id.chart2);
-                mCharts[2] = (LineChart) findViewById(R.id.chart3);
+                mCharts[0] = findViewById(R.id.chart1);
+                mCharts[1] = findViewById(R.id.chart2);
                 break;
         }
 
         String depth_name = GetDepthName(lasData);
         List<Float> depth_data = lasData.get(depth_name);
+
+        if(mCharts.length > 1){
+            mCharts[0].setOnChartGestureListener(new CoupleChartGestureListener(
+                    mCharts[0], new Chart[] { mCharts[1] }));
+            mCharts[1].setOnChartGestureListener(new CoupleChartGestureListener(
+                    mCharts[1], new Chart[] { mCharts[0] }));
+        }
 
         for (int trackIndex = 0; trackIndex < num_tracks; trackIndex++) { // variable t = tracks in for loop
 
@@ -98,7 +99,7 @@ public class ChartActivity extends AppCompatActivity {
                     scaleMin = scaleCbr(scaleMin);
                 }
 
-                for (int x = 0; x < curve_data.size(); x+=5) { // variable x = number of values for each curve
+                for (int x = 0; x < curve_data.size(); x++) { // variable x = number of values for each curve
 
                     float x_val = curve_data.get(x); // value from curve (x-axis)
                     float y_val = depth_data.get(x); // value from depth (y-axis)
@@ -123,6 +124,7 @@ public class ChartActivity extends AppCompatActivity {
                 SetCurveColor(set1, curveColor);
                 SetCurveStyle(set1, lineStyle);
 
+                set1.setLineWidth(2f);
                 set1.setDrawCircles(false);
                 set1.setDrawHighlightIndicators(false);
                 set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
@@ -140,14 +142,11 @@ public class ChartActivity extends AppCompatActivity {
 
     private void SetCurveStyle(LineDataSet data, String lineStyle) {
         switch (lineStyle) {
-            case "Normal":
-                data.setLineWidth(1f);
-                break;
             case "Dotted":
-                data.enableDashedLine(2f, 2f, 2f);
+                data.enableDashedLine(10f, 10f, 0f);
                 break;
             case "Bold":
-                data.setLineWidth(2f);
+                data.setLineWidth(3f);
                 break;
         }
     }
